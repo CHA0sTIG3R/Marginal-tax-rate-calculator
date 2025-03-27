@@ -25,7 +25,8 @@ public class MarginalTaxController {
         map.put("MFJ", "Married Filing Jointly");
     }
 
-    MarginalTaxService service;
+    @Autowired
+    private MarginalTaxService service;
 
     @RequestMapping("/marginal-tax-rate")
     public String marginalTax(@ModelAttribute TaxInput taxInput, Model model){

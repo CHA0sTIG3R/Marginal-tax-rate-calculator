@@ -26,7 +26,7 @@ public class MarginalTaxService {
     }
 
     public List<TaxBracketDescription> getTaxBracket(int year, String status, String salary) {
-        float income = getIncome(salary);
+        var income = getIncome(salary);
         return taxBracketDAO.getTaxBracketDescription(year, status, income);
     }
 
