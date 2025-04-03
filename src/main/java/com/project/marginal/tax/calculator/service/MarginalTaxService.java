@@ -1,9 +1,9 @@
-package com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.service;
+package com.project.marginal.tax.calculator.service;
 
-import com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.model.RealTaxRule;
-import com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.model.TaxBracketDAO;
-import com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.model.TaxBracketDescription;
-import com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.model.TaxRuleDAO;
+import com.project.marginal.tax.calculator.model.RealTaxRule;
+import com.project.marginal.tax.calculator.model.TaxBracketDAO;
+import com.project.marginal.tax.calculator.model.TaxBracketDescription;
+import com.project.marginal.tax.calculator.model.TaxRuleDAO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

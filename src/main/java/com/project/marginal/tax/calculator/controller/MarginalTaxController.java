@@ -1,7 +1,7 @@
-package com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.controller;
+package com.project.marginal.tax.calculator.controller;
 
-import com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.model.TaxInput;
-import com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.service.MarginalTaxService;
+import com.project.marginal.tax.calculator.model.TaxInput;
+import com.project.marginal.tax.calculator.service.MarginalTaxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.utility.FormatDataUtility.format;
-import static com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.utility.FormatDataUtility.percentFormat;
+import static com.project.marginal.tax.calculator.utility.FormatDataUtility.format;
+import static com.project.marginal.tax.calculator.utility.FormatDataUtility.percentFormat;
 
 
 @Controller

@@ -1,4 +1,4 @@
-package com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.model;
+package com.project.marginal.tax.calculator.model;
 
 public class TaxInput {
 

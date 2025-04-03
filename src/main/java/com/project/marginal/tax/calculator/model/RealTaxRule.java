@@ -1,9 +1,10 @@
-package com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.model;
+package com.project.marginal.tax.calculator.model;
 
 import org.apache.poi.ss.usermodel.Row;
 
-import static com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.utility.FormatDataUtility.format;
-import static com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.utility.FormatDataUtility.percentFormat;
+
+import static com.project.marginal.tax.calculator.utility.FormatDataUtility.format;
+import static com.project.marginal.tax.calculator.utility.FormatDataUtility.percentFormat;
 
 public class RealTaxRule {
 

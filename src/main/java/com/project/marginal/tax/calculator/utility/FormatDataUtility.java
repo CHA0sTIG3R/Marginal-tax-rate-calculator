@@ -1,4 +1,4 @@
-package com.project.marginal.tax.calculator.Marginal.tax.rate.calculator.utility;
+package com.project.marginal.tax.calculator.utility;
 
 import java.text.DecimalFormat;
 
