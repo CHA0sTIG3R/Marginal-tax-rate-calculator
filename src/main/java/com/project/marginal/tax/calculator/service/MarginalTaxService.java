@@ -1,16 +1,41 @@
 package com.project.marginal.tax.calculator.service;
 
-import com.project.marginal.tax.calculator.model.RealTaxRule;
-import com.project.marginal.tax.calculator.model.TaxBracketDAO;
-import com.project.marginal.tax.calculator.model.TaxBracketDescription;
-import com.project.marginal.tax.calculator.model.TaxRuleDAO;
+import com.opencsv.exceptions.CsvValidationException;
+import com.project.marginal.tax.calculator.model.*;
+import com.project.marginal.tax.calculator.repository.TaxRateRepository;
+import com.project.marginal.tax.calculator.utility.CsvImportUtility;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 
 @Service
 public class MarginalTaxService {
+
+    @Autowired
+    private TaxRateRepository taxRateRepo;
+
+    private final CsvImportUtility importUtility = new CsvImportUtility();
+
+    public String loadData() throws CsvValidationException, IOException {
+        var entry = importUtility.importCsv("src/main/resources/static/Historical Income Tax Rates and Brackets, 1862-2021.csv");
+
+        for (BracketEntry be : entry){
+            TaxRate taxRate = new TaxRate();
+            taxRate.setYear(be.getYear());
+            taxRate.setStatus(be.getStatus());
+            taxRate.setRate(be.getRate());
+            taxRate.setRangeStart(be.getRangeStart());
+            taxRate.setRangeEnd(be.getRangeEnd());
+            taxRate.setNote(be.getNote());
+
+            taxRateRepo.save(taxRate);
+        }
+
+        return "Data imported Successfully";
+    }
 
     private final TaxBracketDAO taxBracketDAO = new TaxBracketDAO();
 

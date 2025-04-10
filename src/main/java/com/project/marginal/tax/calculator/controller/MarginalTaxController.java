@@ -1,13 +1,16 @@
 package com.project.marginal.tax.calculator.controller;
 
+import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.model.TaxInput;
 import com.project.marginal.tax.calculator.service.MarginalTaxService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +18,7 @@ import static com.project.marginal.tax.calculator.utility.FormatDataUtility.form
 import static com.project.marginal.tax.calculator.utility.FormatDataUtility.percentFormat;
 
 
-@Controller
+@RestController
 public class MarginalTaxController {
 
     static Map<String, String> map = new HashMap<>();
@@ -49,5 +52,15 @@ public class MarginalTaxController {
         model.addAttribute("totalRate", percentFormat(totalTaxRate));
 
         return "marginal-tax.jsp";
+    }
+
+    @GetMapping("/load-data")
+    public String loadData() throws CsvValidationException, IOException {
+        return service.loadData();
+    }
+
+    @GetMapping("/")
+    public String hello() {
+        return "Sending Message";
     }
 }
