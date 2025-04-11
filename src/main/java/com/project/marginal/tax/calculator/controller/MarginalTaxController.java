@@ -1,12 +1,18 @@
 package com.project.marginal.tax.calculator.controller;
 
 import com.opencsv.exceptions.CsvValidationException;
+import com.project.marginal.tax.calculator.model.TaxInput;
+import com.project.marginal.tax.calculator.model.TaxPaidInfo;
+import com.project.marginal.tax.calculator.model.TaxRate;
 import com.project.marginal.tax.calculator.service.MarginalTaxService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @RestController
@@ -21,16 +27,26 @@ public class MarginalTaxController {
     }
 
     @GetMapping("/get-years")
-    public String getYears() throws CsvValidationException, IOException {
-        return "update later for get years";
+    public List<Integer> getYears() {
+        return service.getYearsWithMissing();
     }
 
-    @GetMapping("/calculate-tax")
-    public String calculateTax(){
-        return "update later for calculate tax";
+    @GetMapping("/get-filing-status")
+    public List<String> getFilingStatus() {
+        return service.getFilingStatus();
     }
 
-    @GetMapping("/")
+    @GetMapping("/get-tax-rate/{year}")
+    public List<TaxRate> getTaxRateByYear(@PathVariable String year) {
+        return service.getTaxRateByYear(Integer.parseInt(year));
+    }
+
+    @GetMapping("/get-tax-rate/{year}/{status}")
+    public List<TaxRate> getTaxRateByYearAndStatus(@PathVariable String year, @PathVariable String status) {
+        return service.getTaxRateByYearAndStatus(Integer.parseInt(year), status);
+    }
+
+    @GetMapping(value = "/", produces = MediaType.TEXT_PLAIN_VALUE)
     public String hello() {
         return "Sending Message";
     }

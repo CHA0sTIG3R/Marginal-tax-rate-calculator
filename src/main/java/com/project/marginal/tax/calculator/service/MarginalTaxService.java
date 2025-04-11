@@ -75,11 +75,6 @@ public class MarginalTaxService {
         return taxRateRepo.findByYear(year);
     }
 
-    // get the tax rates by status
-    public List<TaxRate> getTaxRateByStatus(String status) {
-        return taxRateRepo.findByStatus(status);
-    }
-
     // get the tax rates by year and status
     public List<TaxRate> getTaxRateByYearAndStatus(int year, String status) {
         return taxRateRepo.findByYearAndStatus(year, status);
@@ -91,9 +86,14 @@ public class MarginalTaxService {
     }
 
     // calculate the tax for a given income
-    public List<Float> calculateTax(int year, String status, float income) {
-        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(year, status, income);
+    public List<Float> calculateTax(TaxInput taxInput) {
+        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(
+                taxInput.getYear(),
+                taxInput.getStatus(),
+                taxInput.getIncome()
+        );
         var taxPaidPerBracket = new ArrayList<Float>();
+        float income = taxInput.getIncome();
 
         // Iterate through the tax rates and calculate the tax paid for each bracket
         for (TaxRate taxRate : taxRates) {
@@ -109,10 +109,15 @@ public class MarginalTaxService {
     }
 
     // get tax paid information
-    public List<TaxPaidInfo> getTaxPaidInfo(int year, String status, float income) {
-        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(year, status, income);
-        var taxPaidPerBracket = calculateTax(year, status, income);
+    public List<TaxPaidInfo> getTaxPaidInfo(TaxInput taxInput) {
+        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(
+                taxInput.getYear(),
+                taxInput.getStatus(),
+                taxInput.getIncome()
+        );
+        var taxPaidPerBracket = calculateTax(taxInput);
         var taxPaidInfos = new ArrayList<TaxPaidInfo>();
+        float income = taxInput.getIncome();
 
         // Iterate through the tax rates and calculate the tax paid for each bracket and create TaxPaidInfo objects
         for (int i = 0; i < taxRates.size(); i++) {
@@ -121,7 +126,7 @@ public class MarginalTaxService {
             float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
             float taxPaid = taxPaidPerBracket.get(i);
 
-            TaxPaidInfo info = new TaxPaidInfo(year, status, rangeStart, rangeEnd, taxRate.getRate().floatValue(), taxPaid);
+            TaxPaidInfo info = new TaxPaidInfo(taxInput.getYear(), taxInput.getStatus(), rangeStart, rangeEnd, taxRate.getRate().floatValue(), taxPaid);
             taxPaidInfos.add(info);
         }
 
@@ -129,9 +134,9 @@ public class MarginalTaxService {
     }
 
     // get total tax paid
-    public float getTotalTaxPaid(int year, String status, float income) {
+    public float getTotalTaxPaid(TaxInput taxInput) {
         // Calculate the total tax paid by summing up the tax paid for each bracket
-        return (float) calculateTax(year, status, income).stream()
+        return (float) calculateTax(taxInput).stream()
                 .mapToDouble(Float::floatValue)
                 .sum();
     }

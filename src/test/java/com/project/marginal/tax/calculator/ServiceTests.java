@@ -1,5 +1,6 @@
 package com.project.marginal.tax.calculator;
 
+import com.project.marginal.tax.calculator.model.TaxInput;
 import com.project.marginal.tax.calculator.model.TaxPaidInfo;
 import com.project.marginal.tax.calculator.model.TaxRate;
 import com.project.marginal.tax.calculator.service.MarginalTaxService;
@@ -69,22 +70,6 @@ public class ServiceTests {
         System.out.println(taxRates);
     }
 
-    // test getTaxRateByStatus
-    @Test
-    public void testGetTaxRateByStatus() {
-        List<TaxRate> taxRates = marginalTaxService.getTaxRateByStatus("Single");
-        assertNotNull(taxRates);
-        assertFalse(taxRates.isEmpty());
-        assertEquals(2339, taxRates.size());
-        assertEquals("Single", taxRates.get(0).getStatus());
-
-        for (TaxRate taxRate : taxRates) {
-            assertEquals("Single", taxRate.getStatus());
-        }
-
-        System.out.println(taxRates);
-    }
-
     // test getTaxRateByYearAndStatus
     @Test
     public void testGetTaxRateByYearAndStatus() {
@@ -125,7 +110,12 @@ public class ServiceTests {
     // test calculateTax
     @Test
     public void testCalculateTax() {
-        List<Float> taxPaid = marginalTaxService.calculateTax(2021, "Single", 50000);
+        TaxInput taxInput = new TaxInput(
+                2021,
+                "Single",
+                "50000"
+        );
+        List<Float> taxPaid = marginalTaxService.calculateTax(taxInput);
         assertNotNull(taxPaid);
         assertFalse(taxPaid.isEmpty());
         assertEquals(3, taxPaid.size());
@@ -141,16 +131,21 @@ public class ServiceTests {
     // test getTaxPaidInfo
     @Test
     public void testGetTaxPaidInfo() {
-        List<TaxPaidInfo> taxPaidInfos = marginalTaxService.getTaxPaidInfo(2021, "Single", 50000);
+        TaxInput taxInput = new TaxInput(
+                2021,
+                "Single",
+                "50000"
+        );
+        List<TaxPaidInfo> taxPaidInfos = marginalTaxService.getTaxPaidInfo(taxInput);
         assertNotNull(taxPaidInfos);
         assertFalse(taxPaidInfos.isEmpty());
         assertEquals(3, taxPaidInfos.size());
-        assertEquals("2021", taxPaidInfos.get(0).getYear());
+        assertEquals(2021, taxPaidInfos.get(0).getYear().intValue());
         assertEquals("Single", taxPaidInfos.get(0).getStatus());
         assertEquals("0.00", taxPaidInfos.get(0).getRangeStart());
 
         for (TaxPaidInfo taxPaid : taxPaidInfos) {
-            assertEquals("2021", taxPaid.getYear());
+            assertEquals(2021, taxPaid.getYear().intValue());
             assertEquals("Single", taxPaid.getStatus());
             assertTrue(new BigDecimal(taxPaid.getRangeStart()).compareTo(new BigDecimal("50000")) <= 0);
         }
@@ -160,7 +155,12 @@ public class ServiceTests {
     // test getTotalTaxPaid
     @Test
     public void testGetTotalTaxPaid() {
-        float totalTaxPaid = marginalTaxService.getTotalTaxPaid(2021, "Single", 50000);
+        TaxInput taxInput = new TaxInput(
+                2021,
+                "Single",
+                "50000"
+        );
+        float totalTaxPaid = marginalTaxService.getTotalTaxPaid(taxInput);
         assertTrue(totalTaxPaid >= 0);
         System.out.println(totalTaxPaid);
     }

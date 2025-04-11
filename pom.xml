@@ -66,7 +66,6 @@
 			<version>42.7.5</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>jakarta.servlet.jsp.jstl</groupId>
 			<artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
@@ -78,20 +77,13 @@
 			<version>3.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>edu.citytech.cst.helper</groupId>
-			<artifactId>cst4713helper</artifactId>
-			<version>1.02</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
         <dependency>
             <groupId>junit</groupId>
