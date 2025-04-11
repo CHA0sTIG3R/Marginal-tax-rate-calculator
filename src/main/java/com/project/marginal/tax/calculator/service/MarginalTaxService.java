@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,6 +65,75 @@ public class MarginalTaxService {
         return Arrays.stream(FilingStatus.values())
                 .map(filingStatus -> filingStatus.label)
                 .toList();
+    }
+
+    // get the tax rates for a year
+    public List<TaxRate> getTaxRateByYear(int year) {
+        return taxRateRepo.findByYear(year);
+    }
+
+    // get the tax rates by status
+    public List<TaxRate> getTaxRateByStatus(String status) {
+        return taxRateRepo.findByStatus(status);
+    }
+
+    // get the tax rates by year and status
+    public List<TaxRate> getTaxRateByYearAndStatus(int year, String status) {
+        return taxRateRepo.findByYearAndStatus(year, status);
+    }
+
+    // get the tax rates by year, status and all ranges less than or equal to the income
+    public List<TaxRate> getTaxRateByYearAndStatusAndRangeStartLessThanEqual(int year, String status, float income) {
+        return taxRateRepo.findByYearAndStatusAndRangeStartLessThanEqual(year, status, new BigDecimal(income));
+    }
+
+    // calculate the tax for a given income
+    public List<Float> calculateTax(int year, String status, float income) {
+        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(year, status, income);
+        var taxPaidPerBracket = new ArrayList<Float>();
+
+        for (TaxRate taxRate : taxRates) {
+            float taxPaid;
+            if (income > taxRate.getRangeStart().floatValue()) {
+                float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
+                taxPaid = (rangeEnd - taxRate.getRangeStart().floatValue()) * (taxRate.getRate().floatValue() / 100);
+                taxPaidPerBracket.add(taxPaid);
+            }
+        }
+
+        return taxPaidPerBracket;
+    }
+
+    // get tax paid information
+    public List<TaxPaidInfo> getTaxPaidInfo(int year, String status, float income) {
+        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(year, status, income);
+        var taxPaidInfo = new ArrayList<TaxPaidInfo>();
+
+        for (TaxRate taxRate : taxRates) {
+            float taxPaid;
+            if (income > taxRate.getRangeStart().floatValue()) {
+                float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
+                taxPaid = (rangeEnd - taxRate.getRangeStart().floatValue()) * (taxRate.getRate().floatValue() / 100);
+                TaxPaidInfo taxPaidInfoObj = new TaxPaidInfo(
+                        String.valueOf(taxRate.getYear()),
+                        taxRate.getStatus(),
+                        String.valueOf(taxRate.getRangeStart()),
+                        String.valueOf(taxRate.getRangeEnd()),
+                        String.valueOf(taxRate.getRate()),
+                        String.valueOf(taxPaid)
+                );
+                taxPaidInfo.add(taxPaidInfoObj);
+            }
+        }
+
+        return taxPaidInfo;
+    }
+
+    // get total tax paid
+    public float getTotalTaxPaid(int year, String status, float income) {
+        return (float) calculateTax(year, status, income).stream()
+                .mapToDouble(Float::floatValue)
+                .sum();
     }
 
     private final TaxBracketDAO taxBracketDAO = new TaxBracketDAO();
