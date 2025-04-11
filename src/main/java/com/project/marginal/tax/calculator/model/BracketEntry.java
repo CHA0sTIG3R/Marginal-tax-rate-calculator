@@ -2,7 +2,13 @@ package com.project.marginal.tax.calculator.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Represents a tax bracket entry for a specific year and filing status. <br><br>
+ * Created to facilitate the import of tax rate data from a CSV file and populate the rangeEnd value based on the next entry. <br>
+ *
+ */
 public class BracketEntry {
+
     private Integer year;
     private String status;
     private BigDecimal rate;
