@@ -18,8 +18,17 @@ import java.util.*;
 
 public class CsvImportUtility {
 
-    private List<BracketEntry> rates = new ArrayList<>();
+    private final List<BracketEntry> rates = new ArrayList<>();
 
+    /**
+     * This method is used to import tax rates from a CSV file.
+     * It reads the CSV file, parses the data, and populates the rates list with BracketEntry objects.
+     *
+     * @param filePath The path to the CSV file.
+     * @return A list of BracketEntry objects representing the tax rates.
+     * @throws IOException If an I/O error occurs while reading the file.
+     * @throws CsvValidationException If a CSV validation error occurs.
+     */
     public List<BracketEntry> importCsv(String filePath) throws IOException, CsvValidationException {
         try (Reader reader = Files.newBufferedReader(Paths.get(filePath))){
             CSVReader csvReader = new CSVReader(reader);
@@ -52,6 +61,11 @@ public class CsvImportUtility {
         return rates;
     }
 
+    /**
+     * This method is used to populate the range end for each tax bracket.
+     * It groups the tax brackets by year and status, sorts them by range start,
+     * and sets the range end for each bracket based on the next bracket's start.
+     */
     private void populateRangeEnd() {
         Map<YearStatus, List<BracketEntry>> map = new HashMap<>();
 
@@ -76,6 +90,16 @@ public class CsvImportUtility {
         }
     }
 
+    /**
+     * This method is used to insert a tax rate into the rates list.
+     * It creates a new BracketEntry object and sets its properties based on the provided parameters.
+     *
+     * @param year The year of the tax rate.
+     * @param status The filing status (e.g., "Married Filing Jointly").
+     * @param rawRate The raw tax rate as a string (e.g., "24%").
+     * @param rawStart The raw starting range as a string (e.g., "$50,000").
+     * @param note A note associated with the tax rate.
+     */
     private void insertTaxRate(Integer year, String status, String rawRate, String rawStart, String note) {
         BigDecimal rate = (!Objects.equals(rawRate, ""))? new BigDecimal(rawRate.replace("%", "")) : BigDecimal.ZERO;
 
@@ -90,6 +114,13 @@ public class CsvImportUtility {
         rates.add(bracketEntry);
     }
 
+    /**
+     * This method is used to parse the dollar value from a string.
+     * It removes the dollar sign and commas, and converts it to a BigDecimal.
+     *
+     * @param dollarStr The dollar string to be parsed.
+     * @return The parsed BigDecimal value.
+     */
     private BigDecimal parseDollarValue(String dollarStr) {
         String cleaned = dollarStr.replace("$", "").replace(",", "");
         if (cleaned.trim().isEmpty()) {
@@ -98,11 +129,14 @@ public class CsvImportUtility {
         return new BigDecimal(cleaned.trim());
     }
 
+    /**
+     * This method is used to parse the year 1940 entry in the CSV file.
+     * The entry is in the format "1940(A)" and we need to remove the "(A)" part.
+     *
+     * @param year The year string to be parsed.
+     * @return The parsed year string without the "(A)" part.
+     */
     private String parseYear1940Entry(String year){
         return year.replace("(A)", "");
-    }
-
-    public static void main(String[] args) throws CsvValidationException, IOException {
-        new CsvImportUtility().importCsv("src/main/resources/static/Historical Income Tax Rates and Brackets, 1862-2021.csv").forEach(System.out::println);
     }
 }

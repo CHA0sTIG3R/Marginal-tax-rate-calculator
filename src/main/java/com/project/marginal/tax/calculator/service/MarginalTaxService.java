@@ -24,6 +24,7 @@ public class MarginalTaxService {
     public String loadData() throws CsvValidationException, IOException {
         var entry = importUtility.importCsv("src/main/resources/static/Historical Income Tax Rates and Brackets, 1862-2021.csv");
 
+        // Iterate through the list of BracketEntry objects and save them to the database
         for (BracketEntry be : entry){
             TaxRate taxRate = new TaxRate();
             taxRate.setYear(be.getYear());
@@ -43,6 +44,7 @@ public class MarginalTaxService {
     public List<Integer> getYearsWithMissing() {
         List<Integer> years = new ArrayList<>(getYears());
 
+        // Fill in the missing years between 1862 and 2021
         for (int i = 1862; i <= 2021; i++) {
             if (!years.contains(i)) {
                 years.add(i);
@@ -53,6 +55,7 @@ public class MarginalTaxService {
     }
 
     private List<Integer> getYears() {
+        // Get the years from the taxRateRepo and convert it to a list of integers
         return taxRateRepo.findAll().stream()
                 .map(TaxRate::getYear)
                 .distinct()
@@ -61,6 +64,7 @@ public class MarginalTaxService {
     }
 
     public List<String> getFilingStatus() {
+        // Get the filing status from the enum and convert it to a list of strings
         return Arrays.stream(FilingStatus.values())
                 .map(filingStatus -> filingStatus.label)
                 .toList();
@@ -91,6 +95,7 @@ public class MarginalTaxService {
         List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(year, status, income);
         var taxPaidPerBracket = new ArrayList<Float>();
 
+        // Iterate through the tax rates and calculate the tax paid for each bracket
         for (TaxRate taxRate : taxRates) {
             float taxPaid;
             if (income > taxRate.getRangeStart().floatValue()) {
@@ -106,30 +111,26 @@ public class MarginalTaxService {
     // get tax paid information
     public List<TaxPaidInfo> getTaxPaidInfo(int year, String status, float income) {
         List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(year, status, income);
-        var taxPaidInfo = new ArrayList<TaxPaidInfo>();
+        var taxPaidPerBracket = calculateTax(year, status, income);
+        var taxPaidInfos = new ArrayList<TaxPaidInfo>();
 
-        for (TaxRate taxRate : taxRates) {
-            float taxPaid;
-            if (income > taxRate.getRangeStart().floatValue()) {
-                float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
-                taxPaid = (rangeEnd - taxRate.getRangeStart().floatValue()) * (taxRate.getRate().floatValue() / 100);
-                TaxPaidInfo taxPaidInfoObj = new TaxPaidInfo(
-                        taxRate.getYear(),
-                        taxRate.getStatus(),
-                        taxRate.getRangeStart().floatValue(),
-                        taxRate.getRangeEnd().floatValue(),
-                        taxRate.getRate().floatValue(),
-                        taxPaid
-                );
-                taxPaidInfo.add(taxPaidInfoObj);
-            }
+        // Iterate through the tax rates and calculate the tax paid for each bracket and create TaxPaidInfo objects
+        for (int i = 0; i < taxRates.size(); i++) {
+            TaxRate taxRate = taxRates.get(i);
+            float rangeStart = taxRate.getRangeStart().floatValue();
+            float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
+            float taxPaid = taxPaidPerBracket.get(i);
+
+            TaxPaidInfo info = new TaxPaidInfo(year, status, rangeStart, rangeEnd, taxRate.getRate().floatValue(), taxPaid);
+            taxPaidInfos.add(info);
         }
 
-        return taxPaidInfo;
+        return taxPaidInfos;
     }
 
     // get total tax paid
     public float getTotalTaxPaid(int year, String status, float income) {
+        // Calculate the total tax paid by summing up the tax paid for each bracket
         return (float) calculateTax(year, status, income).stream()
                 .mapToDouble(Float::floatValue)
                 .sum();

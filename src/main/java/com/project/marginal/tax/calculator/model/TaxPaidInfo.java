@@ -1,6 +1,6 @@
 package com.project.marginal.tax.calculator.model;
 
-import static com.project.marginal.tax.calculator.utility.FormatDataUtility.format;
+import static com.project.marginal.tax.calculator.utility.FormatDataUtility.dollarFormat;
 import static com.project.marginal.tax.calculator.utility.FormatDataUtility.percentFormat;
 
 /**
@@ -20,10 +20,10 @@ public class TaxPaidInfo {
     public TaxPaidInfo(Integer year, String status, float rangeStart, float rangeEnd, float taxRate, float taxPaid) {
         this.year = year;
         this.status = status;
-        this.rangeStart = format(rangeStart);
-        this.rangeEnd = format(rangeEnd);
+        this.rangeStart = dollarFormat(rangeStart);
+        this.rangeEnd = dollarFormat(rangeEnd);
         this.taxRate = percentFormat(taxRate);
-        this.taxPaid = format(taxPaid);
+        this.taxPaid = dollarFormat(taxPaid);
     }
 
     public Integer getYear() {
