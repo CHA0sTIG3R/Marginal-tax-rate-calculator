@@ -4,6 +4,12 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
+/**
+ * Represents a tax rate for a specific year and filing status.
+ * <p>
+ * This entity is used to store historical tax rates in the database.
+ * </p>
+ */
 @Entity
 @Table(name = "historical_tax_rates")
 public class TaxRate {

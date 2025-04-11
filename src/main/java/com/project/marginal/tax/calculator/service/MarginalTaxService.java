@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 @Service
 public class MarginalTaxService {
 
@@ -115,12 +114,12 @@ public class MarginalTaxService {
                 float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
                 taxPaid = (rangeEnd - taxRate.getRangeStart().floatValue()) * (taxRate.getRate().floatValue() / 100);
                 TaxPaidInfo taxPaidInfoObj = new TaxPaidInfo(
-                        String.valueOf(taxRate.getYear()),
+                        taxRate.getYear(),
                         taxRate.getStatus(),
-                        String.valueOf(taxRate.getRangeStart()),
-                        String.valueOf(taxRate.getRangeEnd()),
-                        String.valueOf(taxRate.getRate()),
-                        String.valueOf(taxPaid)
+                        taxRate.getRangeStart().floatValue(),
+                        taxRate.getRangeEnd().floatValue(),
+                        taxRate.getRate().floatValue(),
+                        taxPaid
                 );
                 taxPaidInfo.add(taxPaidInfoObj);
             }

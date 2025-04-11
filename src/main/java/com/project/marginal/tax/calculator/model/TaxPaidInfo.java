@@ -1,27 +1,36 @@
 package com.project.marginal.tax.calculator.model;
 
+import static com.project.marginal.tax.calculator.utility.FormatDataUtility.format;
+import static com.project.marginal.tax.calculator.utility.FormatDataUtility.percentFormat;
+
+/**
+ * Represents the tax paid information for a specific year and filing status.
+ * <p>
+ * This class is used to explain the tax paid information per bracket for a given year and filing status.
+ * </p>
+ */
 public class TaxPaidInfo {
-    private String year;
+    private Integer year;
     private String status;
     private String rangeStart;
     private String rangeEnd;
     private String taxRate;
     private String taxPaid;
 
-    public TaxPaidInfo(String year, String status, String rangeStart, String rangeEnd, String taxRate, String taxPaid) {
+    public TaxPaidInfo(Integer year, String status, float rangeStart, float rangeEnd, float taxRate, float taxPaid) {
         this.year = year;
         this.status = status;
-        this.rangeStart = rangeStart;
-        this.rangeEnd = rangeEnd;
-        this.taxRate = taxRate;
-        this.taxPaid = taxPaid;
+        this.rangeStart = format(rangeStart);
+        this.rangeEnd = format(rangeEnd);
+        this.taxRate = percentFormat(taxRate);
+        this.taxPaid = format(taxPaid);
     }
 
-    public String getYear() {
+    public Integer getYear() {
         return year;
     }
 
-    public void setYear(String year) {
+    public void setYear(Integer year) {
         this.year = year;
     }
 

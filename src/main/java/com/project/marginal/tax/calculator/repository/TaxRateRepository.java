@@ -7,6 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Repository interface for managing TaxRate entities.
+ * <p>
+ * This interface extends JpaRepository to provide CRUD operations and custom query methods for TaxRate entities.
+ * </p>
+ */
 @Repository
 public interface TaxRateRepository extends JpaRepository<TaxRate, Long> {
     List<TaxRate> findByYear(Integer year);
