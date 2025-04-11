@@ -1,5 +1,6 @@
 package com.project.marginal.tax.calculator.repository;
 
+import com.project.marginal.tax.calculator.model.FilingStatus;
 import com.project.marginal.tax.calculator.model.TaxRate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,8 +17,10 @@ import java.util.List;
 @Repository
 public interface TaxRateRepository extends JpaRepository<TaxRate, Long> {
     List<TaxRate> findByYear(Integer year);
-    List<TaxRate> findByStatus(String status);
-    List<TaxRate> findByYearAndStatus(Integer year, String status);
+    List<TaxRate> findByStatus(FilingStatus status);
+    List<TaxRate> findByYearAndStatus(Integer year, FilingStatus status);
 
-    List<TaxRate> findByYearAndStatusAndRangeStartLessThanEqual(Integer year, String status, BigDecimal rangeStart);
+    List<TaxRate> findByYearAndStatusAndRangeStartLessThanEqual(
+            Integer year, FilingStatus status, BigDecimal rangeStart
+    );
 }

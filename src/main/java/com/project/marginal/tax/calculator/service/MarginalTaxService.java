@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MarginalTaxService {
@@ -44,6 +44,10 @@ public class MarginalTaxService {
     public List<Integer> getYearsWithMissing() {
         List<Integer> years = new ArrayList<>(getYears());
 
+        if (years.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         // Fill in the missing years between 1862 and 2021
         for (int i = 1862; i <= 2021; i++) {
             if (!years.contains(i)) {
@@ -63,11 +67,8 @@ public class MarginalTaxService {
                 .toList();
     }
 
-    public List<String> getFilingStatus() {
-        // Get the filing status from the enum and convert it to a list of strings
-        return Arrays.stream(FilingStatus.values())
-                .map(filingStatus -> filingStatus.label)
-                .toList();
+    public Map<String, String> getFilingStatus() {
+        return FilingStatus.toMap();
     }
 
     // get the tax rates for a year
@@ -76,12 +77,12 @@ public class MarginalTaxService {
     }
 
     // get the tax rates by year and status
-    public List<TaxRate> getTaxRateByYearAndStatus(int year, String status) {
+    public List<TaxRate> getTaxRateByYearAndStatus(int year, FilingStatus status) {
         return taxRateRepo.findByYearAndStatus(year, status);
     }
 
     // get the tax rates by year, status and all ranges less than or equal to the income
-    public List<TaxRate> getTaxRateByYearAndStatusAndRangeStartLessThanEqual(int year, String status, float income) {
+    public List<TaxRate> getTaxRateByYearAndStatusAndRangeStartLessThanEqual(int year, FilingStatus status, float income) {
         return taxRateRepo.findByYearAndStatusAndRangeStartLessThanEqual(year, status, new BigDecimal(income));
     }
 

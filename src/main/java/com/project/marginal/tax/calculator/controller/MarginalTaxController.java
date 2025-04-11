@@ -1,6 +1,7 @@
 package com.project.marginal.tax.calculator.controller;
 
 import com.opencsv.exceptions.CsvValidationException;
+import com.project.marginal.tax.calculator.model.FilingStatus;
 import com.project.marginal.tax.calculator.model.TaxInput;
 import com.project.marginal.tax.calculator.model.TaxPaidInfo;
 import com.project.marginal.tax.calculator.model.TaxRate;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -32,7 +34,7 @@ public class MarginalTaxController {
     }
 
     @GetMapping("/get-filing-status")
-    public List<String> getFilingStatus() {
+    public Map<String, String> getFilingStatus() {
         return service.getFilingStatus();
     }
 
@@ -42,7 +44,10 @@ public class MarginalTaxController {
     }
 
     @GetMapping("/get-tax-rate/{year}/{status}")
-    public List<TaxRate> getTaxRateByYearAndStatus(@PathVariable String year, @PathVariable String status) {
+    public List<TaxRate> getTaxRateByYearAndStatus(
+            @PathVariable String year,
+            @PathVariable FilingStatus status
+            ) {
         return service.getTaxRateByYearAndStatus(Integer.parseInt(year), status);
     }
 

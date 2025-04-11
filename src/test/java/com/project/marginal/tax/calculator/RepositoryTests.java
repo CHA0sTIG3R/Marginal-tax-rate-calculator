@@ -1,5 +1,6 @@
 package com.project.marginal.tax.calculator;
 
+import com.project.marginal.tax.calculator.model.FilingStatus;
 import com.project.marginal.tax.calculator.model.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import org.junit.Test;
@@ -41,9 +42,9 @@ public class RepositoryTests {
 
      @Test
         public void testFindByStatus() {
-            String status = "Single";
+            String status = "S";
 
-            List<TaxRate> taxRates = taxRateRepository.findByStatus(status);
+            List<TaxRate> taxRates = taxRateRepository.findByStatus(FilingStatus.valueOf(status));
             assertNotNull(taxRates);
             System.out.println(taxRates);
         }
@@ -51,7 +52,7 @@ public class RepositoryTests {
     @Test
     public void testFindByYearAndStatus() {
         Integer year = 2021;
-        String status = "Single";
+        FilingStatus status = FilingStatus.S;
 
         List<TaxRate> taxRates = taxRateRepository.findByYearAndStatus(year, status);
         assertNotNull(taxRates);
@@ -61,7 +62,7 @@ public class RepositoryTests {
     @Test
     public void testFindByYearAndStatusAndRangeStartLessThanEqual() {
         Integer year = 2021;
-        String status = "Single";
+        FilingStatus status = FilingStatus.S;
         BigDecimal rangeStart = new BigDecimal("50000.00");
 
         List<TaxRate> taxRates = taxRateRepository.findByYearAndStatusAndRangeStartLessThanEqual(year, status, rangeStart);

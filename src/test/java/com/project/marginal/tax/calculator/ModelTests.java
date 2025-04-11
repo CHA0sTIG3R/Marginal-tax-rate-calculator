@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 public class ModelTests {
     // Test cases for the model classes
@@ -26,14 +25,14 @@ public class ModelTests {
      public void testBracketEntry() {
             BracketEntry entry = new BracketEntry();
             entry.setYear(2023);
-            entry.setStatus("Single");
+            entry.setStatus(FilingStatus.S);
             entry.setRangeStart(new BigDecimal("0.00"));
             entry.setRangeEnd(new BigDecimal("10000.00"));
             entry.setRate(new BigDecimal("0.10"));
             entry.setNote("Test note");
 
             assertEquals(2023, entry.getYear());
-            assertEquals("Single", entry.getStatus());
+            assertEquals(FilingStatus.S, entry.getStatus());
             assertEquals(new BigDecimal("0.00"), entry.getRangeStart());
             assertEquals(new BigDecimal("10000.00"), entry.getRangeEnd());
             assertEquals(new BigDecimal("0.10"), entry.getRate());
@@ -45,14 +44,14 @@ public class ModelTests {
     public void testTaxRate() {
         TaxRate taxRate = new TaxRate();
         taxRate.setYear(2023);
-        taxRate.setStatus("Single");
+        taxRate.setStatus(FilingStatus.S);
         taxRate.setRangeStart(new BigDecimal("0.00"));
         taxRate.setRangeEnd(new BigDecimal("10000.00"));
         taxRate.setRate(new BigDecimal("0.10"));
         taxRate.setNote("Test note");
 
         assertEquals(2023, taxRate.getYear());
-        assertEquals("Single", taxRate.getStatus());
+        assertEquals(FilingStatus.S, taxRate.getStatus());
         assertEquals(new BigDecimal("0.00"), taxRate.getRangeStart());
         assertEquals(new BigDecimal("10000.00"), taxRate.getRangeEnd());
         assertEquals(new BigDecimal("0.10"), taxRate.getRate());
@@ -62,10 +61,10 @@ public class ModelTests {
     // Example test case for YearStatus record
     @Test
     public void testYearStatus() {
-        YearStatus yearStatus = new YearStatus(2023, "Single");
+        YearStatus yearStatus = new YearStatus(2023, FilingStatus.S);
 
         assertEquals(2023, yearStatus.year());
-        assertEquals("Single", yearStatus.status());
+        assertEquals(FilingStatus.S, yearStatus.status());
     }
 
     // Example test case for FilingStatus enum

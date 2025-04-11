@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class BracketEntry {
 
     private Integer year;
-    private String status;
+    private FilingStatus status;
     private BigDecimal rate;
     private BigDecimal rangeStart;
     private BigDecimal rangeEnd;
@@ -24,11 +24,11 @@ public class BracketEntry {
         this.year = year;
     }
 
-    public String getStatus() {
+    public FilingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(FilingStatus status) {
         this.status = status;
     }
 

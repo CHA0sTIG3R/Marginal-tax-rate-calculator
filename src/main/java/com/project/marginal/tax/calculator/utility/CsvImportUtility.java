@@ -3,11 +3,8 @@ package com.project.marginal.tax.calculator.utility;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.model.BracketEntry;
-import com.project.marginal.tax.calculator.model.TaxRate;
+import com.project.marginal.tax.calculator.model.FilingStatus;
 import com.project.marginal.tax.calculator.model.YearStatus;
-import com.project.marginal.tax.calculator.repository.TaxRateRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -49,10 +46,10 @@ public class CsvImportUtility {
 
                 Integer year = Integer.valueOf(yearStr);
 
-                insertTaxRate(year, "Married Filing Jointly", line[1], line[3], line[13]);
-                insertTaxRate(year, "Married Filing Separately", line[4], line[6], line[13]);
-                insertTaxRate(year, "Single", line[7], line[9], line[13]);
-                insertTaxRate(year, "Head of Household", line[10], line[12], line[13]);
+                insertTaxRate(year, FilingStatus.MFJ, line[1], line[3], line[13]);
+                insertTaxRate(year, FilingStatus.MFS, line[4], line[6], line[13]);
+                insertTaxRate(year, FilingStatus.S, line[7], line[9], line[13]);
+                insertTaxRate(year, FilingStatus.HH, line[10], line[12], line[13]);
             }
         }
 
@@ -100,7 +97,7 @@ public class CsvImportUtility {
      * @param rawStart The raw starting range as a string (e.g., "$50,000").
      * @param note A note associated with the tax rate.
      */
-    private void insertTaxRate(Integer year, String status, String rawRate, String rawStart, String note) {
+    private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart, String note) {
         BigDecimal rate = (!Objects.equals(rawRate, ""))? new BigDecimal(rawRate.replace("%", "")) : BigDecimal.ZERO;
 
         BigDecimal start = (!Objects.equals(rawStart, ""))? parseDollarValue(rawStart) : BigDecimal.ZERO;

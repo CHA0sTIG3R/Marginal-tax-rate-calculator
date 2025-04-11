@@ -1,5 +1,13 @@
 package com.project.marginal.tax.calculator.model;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * Enum representing the different filing statuses for tax purposes.
  * <p>
@@ -15,5 +23,15 @@ public enum FilingStatus {
     public final String label;
     FilingStatus(String label) {
         this.label = label;
+    }
+
+    /**
+     * Returns an unmodifiable map of enum names -> labels, e.g. "S" -> "Single".
+     */
+    public static @NotNull @UnmodifiableView Map<String, String> toMap() {
+        return Collections.unmodifiableMap(
+                Arrays.stream(values())
+                        .collect(Collectors.toMap(Enum::name, fs -> fs.label))
+        );
     }
 }

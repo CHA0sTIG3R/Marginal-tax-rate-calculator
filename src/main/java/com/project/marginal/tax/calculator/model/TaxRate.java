@@ -19,7 +19,8 @@ public class TaxRate {
     private Long id;
 
     private Integer year;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private FilingStatus status;
     private BigDecimal rate;
     private BigDecimal rangeStart;
     private BigDecimal rangeEnd;
@@ -43,11 +44,11 @@ public class TaxRate {
         this.year = year;
     }
 
-    public String getStatus() {
+    public FilingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(FilingStatus status) {
         this.status = status;
     }
 

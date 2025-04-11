@@ -2,10 +2,10 @@ package com.project.marginal.tax.calculator.model;
 
 public class TaxInput {
     private Integer year;
-    private String status;
+    private FilingStatus status;
     private Float income;
 
-    public TaxInput(Integer year, String status, String income) {
+    public TaxInput(Integer year, FilingStatus status, String income) {
         this.year = year;
         this.status = status;
         this.income = Float.parseFloat(income);
@@ -19,11 +19,11 @@ public class TaxInput {
         this.year = year;
     }
 
-    public String getStatus() {
+    public FilingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(FilingStatus status) {
         this.status = status;
     }
 
