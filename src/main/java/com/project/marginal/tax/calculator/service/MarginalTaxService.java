@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -35,6 +37,33 @@ public class MarginalTaxService {
         }
 
         return "Data imported Successfully";
+    }
+
+    // get years and fill in the missing years between 1862 and 2021
+    public List<Integer> getYearsWithMissing() {
+        List<Integer> years = new ArrayList<>(getYears());
+
+        for (int i = 1862; i <= 2021; i++) {
+            if (!years.contains(i)) {
+                years.add(i);
+            }
+        }
+
+        return years.stream().distinct().sorted().toList();
+    }
+
+    private List<Integer> getYears() {
+        return taxRateRepo.findAll().stream()
+                .map(TaxRate::getYear)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+    public List<String> getFilingStatus() {
+        return Arrays.stream(FilingStatus.values())
+                .map(filingStatus -> filingStatus.label)
+                .toList();
     }
 
     private final TaxBracketDAO taxBracketDAO = new TaxBracketDAO();

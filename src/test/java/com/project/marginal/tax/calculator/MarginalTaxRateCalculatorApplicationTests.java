@@ -1,4 +1,4 @@
-package com.project.marginal.tax.calculator.Marginal.tax.rate.calculator;
+package com.project.marginal.tax.calculator;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

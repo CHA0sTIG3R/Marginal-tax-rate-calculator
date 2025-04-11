@@ -59,6 +59,16 @@ public class MarginalTaxController {
         return service.loadData();
     }
 
+    @GetMapping("/get-years")
+    public String getYears() throws CsvValidationException, IOException {
+        return "update later for get years";
+    }
+
+    @GetMapping("/calculate-tax")
+    public String calculateTax(){
+        return "update later for calculate tax";
+    }
+
     @GetMapping("/")
     public String hello() {
         return "Sending Message";
