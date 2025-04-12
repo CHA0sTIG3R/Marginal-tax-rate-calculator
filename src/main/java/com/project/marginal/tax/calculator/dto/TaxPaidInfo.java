@@ -1,4 +1,6 @@
-package com.project.marginal.tax.calculator.model;
+package com.project.marginal.tax.calculator.dto;
+
+import com.project.marginal.tax.calculator.entity.FilingStatus;
 
 import static com.project.marginal.tax.calculator.utility.FormatDataUtility.dollarFormat;
 import static com.project.marginal.tax.calculator.utility.FormatDataUtility.percentFormat;

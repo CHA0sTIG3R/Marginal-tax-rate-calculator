@@ -1,20 +1,40 @@
-package com.project.marginal.tax.calculator.model;
+package com.project.marginal.tax.calculator.entity;
+
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
 /**
- * Represents a tax bracket entry for a specific year and filing status. <br><br>
- * Created to facilitate the import of tax rate data from a CSV file and populate the rangeEnd value based on the next entry. <br>
- *
+ * Represents a tax rate for a specific year and filing status.
+ * <p>
+ * This entity is used to store historical tax rates in the database.
+ * </p>
  */
-public class BracketEntry {
+@Entity
+@Table(name = "historical_tax_rates")
+public class TaxRate {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private Integer year;
+    @Enumerated(EnumType.STRING)
     private FilingStatus status;
     private Float rate;
     private BigDecimal rangeStart;
     private BigDecimal rangeEnd;
+
+    @Column(columnDefinition = "Text")
     private String note;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Integer getYear() {
         return year;
@@ -66,9 +86,9 @@ public class BracketEntry {
 
     @Override
     public String toString() {
-        return "BracketEntry{" +
-                "taxYear=" + year +
-                ", filingStatus='" + status + '\'' +
+        return "TaxRate{" +
+                "year=" + year +
+                ", status='" + status + '\'' +
                 ", rate=" + rate +
                 ", rangeStart=" + rangeStart +
                 ", rangeEnd=" + rangeEnd +

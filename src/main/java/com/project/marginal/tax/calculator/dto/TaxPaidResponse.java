@@ -1,4 +1,4 @@
-package com.project.marginal.tax.calculator.model;
+package com.project.marginal.tax.calculator.dto;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.project.marginal.tax.calculator;
 
-import com.project.marginal.tax.calculator.controller.MarginalTaxController;
-import com.project.marginal.tax.calculator.service.MarginalTaxService;
+import com.project.marginal.tax.calculator.controller.TaxController;
+import com.project.marginal.tax.calculator.service.TaxService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(controllers = MarginalTaxController.class)
+@WebMvcTest(controllers = TaxController.class)
 public class ControllerTests {
 
     // Test cases for the controller can be added here
@@ -26,7 +26,7 @@ public class ControllerTests {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private MarginalTaxService marginalTaxService;
+    private TaxService taxService;
 
 //     Test the hello endpoint
      @Test

@@ -1,7 +1,9 @@
 package com.project.marginal.tax.calculator.service;
 
 import com.opencsv.exceptions.CsvValidationException;
-import com.project.marginal.tax.calculator.model.*;
+import com.project.marginal.tax.calculator.dto.*;
+import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import com.project.marginal.tax.calculator.utility.CsvImportUtility;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class MarginalTaxService {
+public class TaxService {
 
     @Autowired
     private TaxRateRepository taxRateRepo;

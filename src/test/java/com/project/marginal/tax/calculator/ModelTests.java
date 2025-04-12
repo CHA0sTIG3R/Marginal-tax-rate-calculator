@@ -1,9 +1,9 @@
 package com.project.marginal.tax.calculator;
 
-import com.project.marginal.tax.calculator.model.BracketEntry;
-import com.project.marginal.tax.calculator.model.FilingStatus;
-import com.project.marginal.tax.calculator.model.TaxRate;
-import com.project.marginal.tax.calculator.model.YearStatus;
+import com.project.marginal.tax.calculator.dto.BracketEntry;
+import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.entity.TaxRate;
+import com.project.marginal.tax.calculator.dto.YearStatus;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

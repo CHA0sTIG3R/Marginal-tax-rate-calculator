@@ -1,4 +1,4 @@
-package com.project.marginal.tax.calculator.model;
+package com.project.marginal.tax.calculator.entity;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;

@@ -1,7 +1,7 @@
 package com.project.marginal.tax.calculator;
 
-import com.project.marginal.tax.calculator.model.FilingStatus;
-import com.project.marginal.tax.calculator.model.TaxRate;
+import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;

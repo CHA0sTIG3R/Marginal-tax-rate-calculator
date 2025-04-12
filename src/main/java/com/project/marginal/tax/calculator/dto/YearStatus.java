@@ -1,4 +1,6 @@
-package com.project.marginal.tax.calculator.model;
+package com.project.marginal.tax.calculator.dto;
+
+import com.project.marginal.tax.calculator.entity.FilingStatus;
 
 /**
  * Represents the status of a year in the tax calculation process.

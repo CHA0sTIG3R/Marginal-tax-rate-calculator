@@ -1,4 +1,6 @@
-package com.project.marginal.tax.calculator.model;
+package com.project.marginal.tax.calculator.dto;
+
+import com.project.marginal.tax.calculator.entity.FilingStatus;
 
 public class TaxInput {
     private Integer year;

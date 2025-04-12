@@ -2,9 +2,9 @@ package com.project.marginal.tax.calculator.utility;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-import com.project.marginal.tax.calculator.model.BracketEntry;
-import com.project.marginal.tax.calculator.model.FilingStatus;
-import com.project.marginal.tax.calculator.model.YearStatus;
+import com.project.marginal.tax.calculator.dto.BracketEntry;
+import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.dto.YearStatus;
 
 import java.io.IOException;
 import java.io.Reader;

@@ -1,10 +1,10 @@
 package com.project.marginal.tax.calculator;
 
-import com.project.marginal.tax.calculator.model.FilingStatus;
-import com.project.marginal.tax.calculator.model.TaxInput;
-import com.project.marginal.tax.calculator.model.TaxPaidInfo;
-import com.project.marginal.tax.calculator.model.TaxRate;
-import com.project.marginal.tax.calculator.service.MarginalTaxService;
+import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.dto.TaxInput;
+import com.project.marginal.tax.calculator.dto.TaxPaidInfo;
+import com.project.marginal.tax.calculator.entity.TaxRate;
+import com.project.marginal.tax.calculator.service.TaxService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class ServiceTests {
 
     @Autowired
-    private MarginalTaxService marginalTaxService;
+    private TaxService taxService;
     // Test cases for the service classes
 
     // 1. Test MarginalTaxService
@@ -31,38 +31,38 @@ public class ServiceTests {
     // test getFilingStatus
     @Test
     public void testGetFilingStatus() {
-        assertNotNull(marginalTaxService.getFilingStatus());
-        assertFalse(marginalTaxService.getFilingStatus().isEmpty());
-        assertTrue(marginalTaxService.getFilingStatus().containsKey("S"));
-        assertTrue(marginalTaxService.getFilingStatus().containsKey("MFJ"));
-        assertTrue(marginalTaxService.getFilingStatus().containsKey("HH"));
-        assertTrue(marginalTaxService.getFilingStatus().containsKey("MFS"));
-        assertEquals("Single", marginalTaxService.getFilingStatus().get("S"));
-        assertEquals("Married Filing Jointly", marginalTaxService.getFilingStatus().get("MFJ"));
-        assertEquals("Head of Household", marginalTaxService.getFilingStatus().get("HH"));
-        assertEquals("Married Filing Separately", marginalTaxService.getFilingStatus().get("MFS"));
+        assertNotNull(taxService.getFilingStatus());
+        assertFalse(taxService.getFilingStatus().isEmpty());
+        assertTrue(taxService.getFilingStatus().containsKey("S"));
+        assertTrue(taxService.getFilingStatus().containsKey("MFJ"));
+        assertTrue(taxService.getFilingStatus().containsKey("HH"));
+        assertTrue(taxService.getFilingStatus().containsKey("MFS"));
+        assertEquals("Single", taxService.getFilingStatus().get("S"));
+        assertEquals("Married Filing Jointly", taxService.getFilingStatus().get("MFJ"));
+        assertEquals("Head of Household", taxService.getFilingStatus().get("HH"));
+        assertEquals("Married Filing Separately", taxService.getFilingStatus().get("MFS"));
 
-        System.out.println(marginalTaxService.getFilingStatus());
+        System.out.println(taxService.getFilingStatus());
     }
 
     // test getYearsWithMissing
     @Test
     public void testGetYearsWithMissing() {
-        assertEquals(160, marginalTaxService.getYearsWithMissing().size());
-        assertFalse(marginalTaxService.getYearsWithMissing().contains(2022));
-        assertFalse(marginalTaxService.getYearsWithMissing().contains(2023));
-        assertFalse(marginalTaxService.getYearsWithMissing().contains(2024));
-        assertTrue(marginalTaxService.getYearsWithMissing().contains(1912));
-        assertTrue(marginalTaxService.getYearsWithMissing().contains(1895));
-        assertTrue(marginalTaxService.getYearsWithMissing().contains(1902));
+        assertEquals(160, taxService.getYearsWithMissing().size());
+        assertFalse(taxService.getYearsWithMissing().contains(2022));
+        assertFalse(taxService.getYearsWithMissing().contains(2023));
+        assertFalse(taxService.getYearsWithMissing().contains(2024));
+        assertTrue(taxService.getYearsWithMissing().contains(1912));
+        assertTrue(taxService.getYearsWithMissing().contains(1895));
+        assertTrue(taxService.getYearsWithMissing().contains(1902));
 
-        System.out.println(marginalTaxService.getYearsWithMissing());
+        System.out.println(taxService.getYearsWithMissing());
     }
 
     // test getTaxRateByYear
     @Test
     public void testGetTaxRateByYear() {
-        List<TaxRate> taxRates = marginalTaxService.getTaxRateByYear(2021);
+        List<TaxRate> taxRates = taxService.getTaxRateByYear(2021);
         assertNotNull(taxRates);
         assertFalse(taxRates.isEmpty());
         assertEquals(28, taxRates.size());
@@ -78,7 +78,7 @@ public class ServiceTests {
     // test getTaxRateByYearAndStatus
     @Test
     public void testGetTaxRateByYearAndStatus() {
-        List<TaxRate> taxRates = marginalTaxService.getTaxRateByYearAndStatus(2021, FilingStatus.valueOf("S"));
+        List<TaxRate> taxRates = taxService.getTaxRateByYearAndStatus(2021, FilingStatus.valueOf("S"));
         assertNotNull(taxRates);
         assertFalse(taxRates.isEmpty());
         assertEquals(7, taxRates.size());
@@ -96,7 +96,7 @@ public class ServiceTests {
     // test getTaxRateByYearAndStatusAndRangeStartLessThanEqual
     @Test
     public void testGetTaxRateByYearAndStatusAndRangeStartLessThanEqual() {
-        List<TaxRate> taxRates = marginalTaxService.getTaxRateByYearAndStatusAndRangeStartLessThanEqual(2021, FilingStatus.S, 50000);
+        List<TaxRate> taxRates = taxService.getTaxRateByYearAndStatusAndRangeStartLessThanEqual(2021, FilingStatus.S, 50000);
         assertNotNull(taxRates);
         assertFalse(taxRates.isEmpty());
         assertEquals(3, taxRates.size());
@@ -120,7 +120,7 @@ public class ServiceTests {
                 FilingStatus.S,
                 "50000"
         );
-        List<Float> taxPaid = marginalTaxService.calculateTax(taxInput);
+        List<Float> taxPaid = taxService.calculateTax(taxInput);
         assertNotNull(taxPaid);
         assertFalse(taxPaid.isEmpty());
         assertEquals(3, taxPaid.size());
@@ -141,7 +141,7 @@ public class ServiceTests {
                 FilingStatus.S,
                 "50000"
         );
-        List<TaxPaidInfo> taxPaidInfos = marginalTaxService.getTaxPaidInfo(taxInput);
+        List<TaxPaidInfo> taxPaidInfos = taxService.getTaxPaidInfo(taxInput);
         assertNotNull(taxPaidInfos);
         assertFalse(taxPaidInfos.isEmpty());
         assertEquals(3, taxPaidInfos.size());
@@ -165,7 +165,7 @@ public class ServiceTests {
                 FilingStatus.S,
                 "50000"
         );
-        float totalTaxPaid = marginalTaxService.getTotalTaxPaid(taxInput);
+        float totalTaxPaid = taxService.getTotalTaxPaid(taxInput);
         assertTrue(totalTaxPaid >= 0);
         System.out.println(totalTaxPaid);
     }

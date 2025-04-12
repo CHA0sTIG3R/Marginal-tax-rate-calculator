@@ -1,24 +1,23 @@
 package com.project.marginal.tax.calculator.controller;
 
 import com.opencsv.exceptions.CsvValidationException;
-import com.project.marginal.tax.calculator.model.*;
-import com.project.marginal.tax.calculator.service.MarginalTaxService;
+import com.project.marginal.tax.calculator.dto.*;
+import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.entity.TaxRate;
+import com.project.marginal.tax.calculator.service.TaxService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static com.project.marginal.tax.calculator.utility.FormatDataUtility.dollarFormat;
-
 
 @RestController
-public class MarginalTaxController {
+public class TaxController {
 
     @Autowired
-    private MarginalTaxService service;
+    private TaxService service;
 
     @GetMapping("/load-data")
     public String loadData() throws CsvValidationException, IOException {
