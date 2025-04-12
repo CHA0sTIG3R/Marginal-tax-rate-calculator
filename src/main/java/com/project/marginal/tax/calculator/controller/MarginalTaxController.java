@@ -25,30 +25,27 @@ public class MarginalTaxController {
         return service.loadData();
     }
 
-    @GetMapping("/get-years")
+    @GetMapping("/api/v1/tax/years")
     public List<Integer> getYears() {
         return service.getYearsWithMissing();
     }
 
-    @GetMapping("/get-filing-status")
+    @GetMapping("/api/v1/tax/filing-status")
     public Map<String, String> getFilingStatus() {
         return service.getFilingStatus();
     }
 
-    @GetMapping("/get-tax-rate/{year}")
-    public List<TaxRate> getTaxRateByYear(@PathVariable String year) {
-        return service.getTaxRateByYear(Integer.parseInt(year));
+    @GetMapping("/api/v1/tax/rate")
+    public List<TaxRate> getTaxRateByYear(@RequestParam String year,
+                                          @RequestParam(required = false) FilingStatus status) {
+        if (status == null) {
+            return service.getTaxRateByYear(Integer.parseInt(year));
+        } else {
+            return service.getTaxRateByYearAndStatus(Integer.parseInt(year), status);
+        }
     }
 
-    @GetMapping("/get-tax-rate/{year}/{status}")
-    public List<TaxRate> getTaxRateByYearAndStatus(
-            @PathVariable String year,
-            @PathVariable FilingStatus status
-            ) {
-        return service.getTaxRateByYearAndStatus(Integer.parseInt(year), status);
-    }
-
-    @PostMapping("/tax-breakdown")
+    @PostMapping("/api/v1/tax/breakdown")
     public TaxPaidResponse getTaxBreakdown(@RequestBody TaxInput taxInput) {
         List<TaxPaidInfo> bracketInfos = service.getTaxPaidInfo(taxInput);
 
@@ -64,10 +61,5 @@ public class MarginalTaxController {
         float totalTaxRate = totalTaxPaid / taxInput.getIncome();
 
         return new TaxPaidResponse(bracketInfos, totalTaxPaid, totalTaxRate);
-    }
-
-    @GetMapping(value = "/", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String hello() {
-        return "Sending Message";
     }
 }
