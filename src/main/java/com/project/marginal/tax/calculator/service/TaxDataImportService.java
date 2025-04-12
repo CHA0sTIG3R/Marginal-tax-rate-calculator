@@ -4,7 +4,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.dto.BracketEntry;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
-import com.project.marginal.tax.calculator.utility.CsvImportUtility;
+import com.project.marginal.tax.calculator.utility.CsvImportUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,10 +13,10 @@ import java.util.List;
 @Service
 public class TaxDataImportService {
 
-    private final CsvImportUtility csvUtil;
+    private final CsvImportUtils csvUtil;
     private final TaxRateRepository repo;
 
-    public TaxDataImportService(CsvImportUtility csvUtil, TaxRateRepository repo) {
+    public TaxDataImportService(CsvImportUtils csvUtil, TaxRateRepository repo) {
         this.csvUtil = csvUtil;
         this.repo = repo;
     }

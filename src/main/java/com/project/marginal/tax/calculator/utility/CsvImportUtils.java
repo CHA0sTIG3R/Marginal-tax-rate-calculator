@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Component
-public class CsvImportUtility {
+public class CsvImportUtils {
 
     private final List<BracketEntry> rates = new ArrayList<>();
 

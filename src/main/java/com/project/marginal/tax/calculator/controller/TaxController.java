@@ -19,7 +19,7 @@ public class TaxController {
 
     @GetMapping("/api/v1/tax/years")
     public List<Integer> getYears() {
-        return service.getYearsWithMissing();
+        return service.listYears();
     }
 
     @GetMapping("/api/v1/tax/filing-status")
@@ -39,19 +39,6 @@ public class TaxController {
 
     @PostMapping("/api/v1/tax/breakdown")
     public TaxPaidResponse getTaxBreakdown(@RequestBody TaxInput taxInput) {
-        List<TaxPaidInfo> bracketInfos = service.getTaxPaidInfo(taxInput);
-
-        float totalTaxPaid = (float) bracketInfos.stream()
-                .mapToDouble(info -> {
-                    String unformatted = info.getTaxPaid()
-                            .replace("$", "")
-                            .replace(",", "");
-                    return Double.parseDouble(unformatted);
-                })
-                .sum();
-
-        float totalTaxRate = totalTaxPaid / taxInput.getIncome();
-
-        return new TaxPaidResponse(bracketInfos, totalTaxPaid, totalTaxRate);
+        return service.calculateTaxBreakdown(taxInput);
     }
 }

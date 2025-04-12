@@ -2,8 +2,8 @@ package com.project.marginal.tax.calculator.dto;
 
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 
-import static com.project.marginal.tax.calculator.utility.FormatDataUtility.dollarFormat;
-import static com.project.marginal.tax.calculator.utility.FormatDataUtility.percentFormat;
+import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.dollarFormat;
+import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
 /**
  * Represents the tax paid information for a specific year and filing status.

@@ -48,15 +48,15 @@ public class ServiceTests {
     // test getYearsWithMissing
     @Test
     public void testGetYearsWithMissing() {
-        assertEquals(160, taxService.getYearsWithMissing().size());
-        assertFalse(taxService.getYearsWithMissing().contains(2022));
-        assertFalse(taxService.getYearsWithMissing().contains(2023));
-        assertFalse(taxService.getYearsWithMissing().contains(2024));
-        assertTrue(taxService.getYearsWithMissing().contains(1912));
-        assertTrue(taxService.getYearsWithMissing().contains(1895));
-        assertTrue(taxService.getYearsWithMissing().contains(1902));
+        assertEquals(160, taxService.listYears().size());
+        assertFalse(taxService.listYears().contains(2022));
+        assertFalse(taxService.listYears().contains(2023));
+        assertFalse(taxService.listYears().contains(2024));
+        assertTrue(taxService.listYears().contains(1912));
+        assertTrue(taxService.listYears().contains(1895));
+        assertTrue(taxService.listYears().contains(1902));
 
-        System.out.println(taxService.getYearsWithMissing());
+        System.out.println(taxService.listYears());
     }
 
     // test getTaxRateByYear

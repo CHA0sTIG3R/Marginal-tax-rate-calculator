@@ -19,7 +19,7 @@ public class TaxService {
     private TaxRateRepository taxRateRepo;
 
     // get years and fill in the missing years between 1862 and 2021
-    public List<Integer> getYearsWithMissing() {
+    public List<Integer> listYears() {
         List<Integer> years = new ArrayList<>(getYears());
 
         if (years.isEmpty()) {
@@ -118,5 +118,14 @@ public class TaxService {
         return (float) calculateTax(taxInput).stream()
                 .mapToDouble(Float::floatValue)
                 .sum();
+    }
+
+    // calculate tax breakdown
+    public TaxPaidResponse calculateTaxBreakdown(TaxInput taxInput) {
+        List<TaxPaidInfo> taxPaidInfos = getTaxPaidInfo(taxInput);
+        float totalTaxPaid = getTotalTaxPaid(taxInput);
+        float avgRate = totalTaxPaid / taxInput.getIncome();
+
+        return new TaxPaidResponse(taxPaidInfos, totalTaxPaid, avgRate);
     }
 }

@@ -2,7 +2,7 @@ package com.project.marginal.tax.calculator.utility;
 
 import java.text.DecimalFormat;
 
-public class FormatDataUtility {
+public class NumberFormatUtils {
 
     /**
      * Formats a given number as currency with two decimal places.

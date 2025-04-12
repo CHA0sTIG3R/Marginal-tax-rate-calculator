@@ -2,19 +2,18 @@ package com.project.marginal.tax.calculator.dto;
 
 import java.util.List;
 
-import static com.project.marginal.tax.calculator.utility.FormatDataUtility.dollarFormat;
-import static com.project.marginal.tax.calculator.utility.FormatDataUtility.percentFormat;
+import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.dollarFormat;
+import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
 public class TaxPaidResponse {
-    private List<TaxPaidInfo> brackets;
-    private String totalTaxPaid;
-    private String totalTaxRate;
+    private final List<TaxPaidInfo> brackets;
+    private final String totalTaxPaid;
+    private final String avgRate;
 
-
-    public TaxPaidResponse(List<TaxPaidInfo> brackets, Float totalTaxPaid, Float totalTaxRate) {
+    public TaxPaidResponse(List<TaxPaidInfo> brackets, Float totalTaxPaid, Float avgRate) {
         this.brackets = brackets;
         this.totalTaxPaid = dollarFormat(totalTaxPaid);
-        this.totalTaxRate = percentFormat(totalTaxRate);
+        this.avgRate = percentFormat(avgRate);
     }
     public List<TaxPaidInfo> getBrackets() {
         return brackets;
@@ -23,7 +22,7 @@ public class TaxPaidResponse {
         return totalTaxPaid;
     }
 
-    public String getTotalTaxRate() {
-        return totalTaxRate;
+    public String getAvgRate() {
+        return avgRate;
     }
 }
