@@ -101,7 +101,7 @@ public class MarginalTaxService {
             float taxPaid;
             if (income > taxRate.getRangeStart().floatValue()) {
                 float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
-                taxPaid = (rangeEnd - taxRate.getRangeStart().floatValue()) * (taxRate.getRate().floatValue() / 100);
+                taxPaid = (rangeEnd - taxRate.getRangeStart().floatValue()) * (taxRate.getRate());
                 taxPaidPerBracket.add(taxPaid);
             }
         }
@@ -127,7 +127,7 @@ public class MarginalTaxService {
             float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
             float taxPaid = taxPaidPerBracket.get(i);
 
-            TaxPaidInfo info = new TaxPaidInfo(taxInput.getYear(), taxInput.getStatus(), rangeStart, rangeEnd, taxRate.getRate().floatValue(), taxPaid);
+            TaxPaidInfo info = new TaxPaidInfo(taxInput.getYear(), taxInput.getStatus(), rangeStart, rangeEnd, taxRate.getRate(), taxPaid);
             taxPaidInfos.add(info);
         }
 

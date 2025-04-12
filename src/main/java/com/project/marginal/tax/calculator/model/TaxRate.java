@@ -21,7 +21,7 @@ public class TaxRate {
     private Integer year;
     @Enumerated(EnumType.STRING)
     private FilingStatus status;
-    private BigDecimal rate;
+    private Float rate;
     private BigDecimal rangeStart;
     private BigDecimal rangeEnd;
 
@@ -52,11 +52,11 @@ public class TaxRate {
         this.status = status;
     }
 
-    public BigDecimal getRate() {
+    public Float getRate() {
         return rate;
     }
 
-    public void setRate(BigDecimal rate) {
+    public void setRate(Float rate) {
         this.rate = rate;
     }
 

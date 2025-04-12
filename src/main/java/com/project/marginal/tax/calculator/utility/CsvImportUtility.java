@@ -98,7 +98,7 @@ public class CsvImportUtility {
      * @param note A note associated with the tax rate.
      */
     private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart, String note) {
-        BigDecimal rate = (!Objects.equals(rawRate, ""))? new BigDecimal(rawRate.replace("%", "")) : BigDecimal.ZERO;
+        Float rate = (!Objects.equals(rawRate, ""))? Float.parseFloat(rawRate.replace("%", "")) / 100 : 0f;
 
         BigDecimal start = (!Objects.equals(rawStart, ""))? parseDollarValue(rawStart) : BigDecimal.ZERO;
 

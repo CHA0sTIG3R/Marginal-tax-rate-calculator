@@ -11,7 +11,7 @@ public class BracketEntry {
 
     private Integer year;
     private FilingStatus status;
-    private BigDecimal rate;
+    private Float rate;
     private BigDecimal rangeStart;
     private BigDecimal rangeEnd;
     private String note;
@@ -32,11 +32,11 @@ public class BracketEntry {
         this.status = status;
     }
 
-    public BigDecimal getRate() {
+    public Float getRate() {
         return rate;
     }
 
-    public void setRate(BigDecimal rate) {
+    public void setRate(Float rate) {
         this.rate = rate;
     }
 

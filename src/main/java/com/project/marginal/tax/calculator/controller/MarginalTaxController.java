@@ -1,20 +1,17 @@
 package com.project.marginal.tax.calculator.controller;
 
 import com.opencsv.exceptions.CsvValidationException;
-import com.project.marginal.tax.calculator.model.FilingStatus;
-import com.project.marginal.tax.calculator.model.TaxInput;
-import com.project.marginal.tax.calculator.model.TaxPaidInfo;
-import com.project.marginal.tax.calculator.model.TaxRate;
+import com.project.marginal.tax.calculator.model.*;
 import com.project.marginal.tax.calculator.service.MarginalTaxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import static com.project.marginal.tax.calculator.utility.FormatDataUtility.dollarFormat;
 
 
 @RestController
@@ -49,6 +46,24 @@ public class MarginalTaxController {
             @PathVariable FilingStatus status
             ) {
         return service.getTaxRateByYearAndStatus(Integer.parseInt(year), status);
+    }
+
+    @PostMapping("/tax-breakdown")
+    public TaxPaidResponse getTaxBreakdown(@RequestBody TaxInput taxInput) {
+        List<TaxPaidInfo> bracketInfos = service.getTaxPaidInfo(taxInput);
+
+        float totalTaxPaid = (float) bracketInfos.stream()
+                .mapToDouble(info -> {
+                    String unformatted = info.getTaxPaid()
+                            .replace("$", "")
+                            .replace(",", "");
+                    return Double.parseDouble(unformatted);
+                })
+                .sum();
+
+        float totalTaxRate = totalTaxPaid / taxInput.getIncome();
+
+        return new TaxPaidResponse(bracketInfos, totalTaxPaid, totalTaxRate);
     }
 
     @GetMapping(value = "/", produces = MediaType.TEXT_PLAIN_VALUE)

@@ -28,14 +28,14 @@ public class ModelTests {
             entry.setStatus(FilingStatus.S);
             entry.setRangeStart(new BigDecimal("0.00"));
             entry.setRangeEnd(new BigDecimal("10000.00"));
-            entry.setRate(new BigDecimal("0.10"));
+            entry.setRate(0.10f);
             entry.setNote("Test note");
 
             assertEquals(2023, entry.getYear());
             assertEquals(FilingStatus.S, entry.getStatus());
             assertEquals(new BigDecimal("0.00"), entry.getRangeStart());
             assertEquals(new BigDecimal("10000.00"), entry.getRangeEnd());
-            assertEquals(new BigDecimal("0.10"), entry.getRate());
+            assertEquals(0.10f, entry.getRate());
             assertEquals("Test note", entry.getNote());
      }
 
@@ -47,14 +47,14 @@ public class ModelTests {
         taxRate.setStatus(FilingStatus.S);
         taxRate.setRangeStart(new BigDecimal("0.00"));
         taxRate.setRangeEnd(new BigDecimal("10000.00"));
-        taxRate.setRate(new BigDecimal("0.10"));
+        taxRate.setRate(0.10f);
         taxRate.setNote("Test note");
 
         assertEquals(2023, taxRate.getYear());
         assertEquals(FilingStatus.S, taxRate.getStatus());
         assertEquals(new BigDecimal("0.00"), taxRate.getRangeStart());
         assertEquals(new BigDecimal("10000.00"), taxRate.getRangeEnd());
-        assertEquals(new BigDecimal("0.10"), taxRate.getRate());
+        assertEquals(0.10f, taxRate.getRate());
         assertEquals("Test note", taxRate.getNote());
     }
 
