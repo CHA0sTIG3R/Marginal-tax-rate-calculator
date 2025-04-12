@@ -1,6 +1,5 @@
 package com.project.marginal.tax.calculator.controller;
 
-import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
@@ -8,7 +7,6 @@ import com.project.marginal.tax.calculator.service.TaxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +16,6 @@ public class TaxController {
 
     @Autowired
     private TaxService service;
-
-    @GetMapping("/load-data")
-    public String loadData() throws CsvValidationException, IOException {
-        return service.loadData();
-    }
 
     @GetMapping("/api/v1/tax/years")
     public List<Integer> getYears() {

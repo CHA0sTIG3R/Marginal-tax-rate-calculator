@@ -1,15 +1,12 @@
 package com.project.marginal.tax.calculator.service;
 
-import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
-import com.project.marginal.tax.calculator.utility.CsvImportUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,27 +17,6 @@ public class TaxService {
 
     @Autowired
     private TaxRateRepository taxRateRepo;
-
-    private final CsvImportUtility importUtility = new CsvImportUtility();
-
-    public String loadData() throws CsvValidationException, IOException {
-        var entry = importUtility.importCsv("src/main/resources/static/Historical Income Tax Rates and Brackets, 1862-2021.csv");
-
-        // Iterate through the list of BracketEntry objects and save them to the database
-        for (BracketEntry be : entry){
-            TaxRate taxRate = new TaxRate();
-            taxRate.setYear(be.getYear());
-            taxRate.setStatus(be.getStatus());
-            taxRate.setRate(be.getRate());
-            taxRate.setRangeStart(be.getRangeStart());
-            taxRate.setRangeEnd(be.getRangeEnd());
-            taxRate.setNote(be.getNote());
-
-            taxRateRepo.save(taxRate);
-        }
-
-        return "Data imported Successfully";
-    }
 
     // get years and fill in the missing years between 1862 and 2021
     public List<Integer> getYearsWithMissing() {

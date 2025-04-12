@@ -5,6 +5,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.dto.BracketEntry;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.dto.YearStatus;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+@Component
 public class CsvImportUtility {
 
     private final List<BracketEntry> rates = new ArrayList<>();
