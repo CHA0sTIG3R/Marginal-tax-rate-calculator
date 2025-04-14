@@ -12,22 +12,23 @@ import java.util.Map;
 
 
 @RestController
+@RequestMapping("/api/v1/tax")
 public class TaxController {
 
     @Autowired
     private TaxService service;
 
-    @GetMapping("/api/v1/tax/years")
+    @GetMapping("/years")
     public List<Integer> getYears() {
         return service.listYears();
     }
 
-    @GetMapping("/api/v1/tax/filing-status")
+    @GetMapping("/filing-status")
     public Map<String, String> getFilingStatus() {
         return service.getFilingStatus();
     }
 
-    @GetMapping("/api/v1/tax/rate")
+    @GetMapping("/rate")
     public List<TaxRate> getTaxRateByYear(@RequestParam String year,
                                           @RequestParam(required = false) FilingStatus status) {
         if (status == null) {
@@ -37,12 +38,12 @@ public class TaxController {
         }
     }
 
-    @PostMapping("/api/v1/tax/breakdown")
+    @PostMapping("/breakdown")
     public TaxPaidResponse getTaxBreakdown(@RequestBody TaxInput taxInput) {
         return service.calculateTaxBreakdown(taxInput);
     }
 
-    @GetMapping("/api/v1/tax/rate/notes")
+    @GetMapping("/notes")
     public TaxNoteResponse getNote(@RequestParam String year) {
         String note = service.getNoteByYear(Integer.parseInt(year));
         return new TaxNoteResponse(Integer.parseInt(year), note);

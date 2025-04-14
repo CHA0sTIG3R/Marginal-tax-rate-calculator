@@ -27,6 +27,6 @@ public interface TaxRateRepository extends JpaRepository<TaxRate, Long> {
             Integer year, FilingStatus status, BigDecimal rangeStart
     );
 
-    @Query("select distinct t from TaxRate t where t.year = :year")
+    @Query("select t from TaxRate t where t.year = :year")
     List<TaxRate> findNoteByYear(@Param("year") Integer year);
 }
