@@ -128,4 +128,15 @@ public class TaxService {
 
         return new TaxPaidResponse(taxPaidInfos, totalTaxPaid, avgRate);
     }
+
+    /**
+     * @return the legislative note for the given year, or a default message if none.
+     */
+    public String getNoteByYear(int year) {
+        return taxRateRepo.findNoteByYear(year).stream()
+                .map(TaxRate::getNote)
+                .filter(n -> !n.isBlank())
+                .findFirst()
+                .orElse("No legislative note available for year " + year);
+    }
 }

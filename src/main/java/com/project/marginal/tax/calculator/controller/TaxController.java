@@ -41,4 +41,10 @@ public class TaxController {
     public TaxPaidResponse getTaxBreakdown(@RequestBody TaxInput taxInput) {
         return service.calculateTaxBreakdown(taxInput);
     }
+
+    @GetMapping("/api/v1/tax/rate/notes")
+    public TaxNoteResponse getNote(@RequestParam String year) {
+        String note = service.getNoteByYear(Integer.parseInt(year));
+        return new TaxNoteResponse(Integer.parseInt(year), note);
+    }
 }
