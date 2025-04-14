@@ -83,7 +83,7 @@ public class CsvImportUtils {
                 if (i < list.size() - 1){
                     list.get(i).setRangeEnd(list.get(i+1).getRangeStart());
                 }else {
-                    list.get(i).setRangeEnd(new BigDecimal("999999999"));
+                    list.get(i).setRangeEnd(null);
                 }
             }
         }

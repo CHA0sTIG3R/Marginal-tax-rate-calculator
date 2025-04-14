@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
+
 @Service
 public class TaxService {
 
@@ -138,5 +140,31 @@ public class TaxService {
                 .filter(n -> !n.isBlank())
                 .findFirst()
                 .orElse("No legislative note available for year " + year);
+    }
+
+
+    public TaxSummaryResponse getSummary(int year, FilingStatus status) {
+        List<TaxRate> taxRates = getTaxRateByYearAndStatus(year, status);
+        int bracketCount = taxRates.size();
+
+        BigDecimal minThreshold = taxRates.stream()
+                .map(TaxRate::getRangeStart)
+                .min(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+
+        BigDecimal maxThreshold = taxRates.stream()
+                .map(TaxRate::getRangeEnd)
+                .max(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+
+        double avgRateRaw = taxRates.stream()
+                .mapToDouble(TaxRate::getRate)
+                .average()
+                .orElse(0.0);
+
+        String averageRate = percentFormat(avgRateRaw);
+        String note = getNoteByYear(year);
+
+        return new TaxSummaryResponse(year, status, bracketCount, minThreshold, maxThreshold, averageRate, note);
     }
 }

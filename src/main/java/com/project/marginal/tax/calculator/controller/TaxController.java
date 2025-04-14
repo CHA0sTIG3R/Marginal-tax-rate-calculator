@@ -48,4 +48,9 @@ public class TaxController {
         String note = service.getNoteByYear(Integer.parseInt(year));
         return new TaxNoteResponse(Integer.parseInt(year), note);
     }
+
+    @GetMapping("/summary")
+    public TaxSummaryResponse getSummary(@RequestParam int year, @RequestParam FilingStatus status) {
+        return service.getSummary(year, status);
+    }
 }
