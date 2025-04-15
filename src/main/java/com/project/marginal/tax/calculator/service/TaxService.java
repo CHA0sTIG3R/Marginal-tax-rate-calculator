@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
@@ -20,26 +21,7 @@ public class TaxService {
     @Autowired
     private TaxRateRepository taxRateRepo;
 
-    // get years and fill in the missing years between 1862 and 2021
     public List<Integer> listYears() {
-        List<Integer> years = new ArrayList<>(getYears());
-
-        if (years.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        // Fill in the missing years between 1862 and 2021
-        for (int i = 1862; i <= 2021; i++) {
-            if (!years.contains(i)) {
-                years.add(i);
-            }
-        }
-
-        return years.stream().distinct().sorted().toList();
-    }
-
-    private List<Integer> getYears() {
-        // Get the years from the taxRateRepo and convert it to a list of integers
         return taxRateRepo.findAll().stream()
                 .map(TaxRate::getYear)
                 .distinct()
@@ -52,13 +34,39 @@ public class TaxService {
     }
 
     // get the tax rates for a year
-    public List<TaxRate> getTaxRateByYear(int year) {
-        return taxRateRepo.findByYear(year);
+    public List<TaxRateDto> getTaxRateByYear(int year) {
+        return taxRateRepo.findByYear(year).stream()
+                .map(taxRate -> new TaxRateDto(
+                        taxRate.getYear(),
+                        taxRate.getStatus(),
+                        taxRate.getRangeStart().floatValue(),
+                        taxRate.getRangeEnd() != null ? taxRate.getRangeEnd().floatValue(): 0,
+                        taxRate.getRate(),
+                        taxRate.getNote()
+                ))
+                .toList();
     }
 
     // get the tax rates by year and status
-    public List<TaxRate> getTaxRateByYearAndStatus(int year, FilingStatus status) {
-        return taxRateRepo.findByYearAndStatus(year, status);
+    public List<TaxRateDto> getTaxRateByYearAndStatus(int year, FilingStatus status) {
+        return taxRateRepo.findByYearAndStatus(year, status).stream()
+                .map(taxRate -> new TaxRateDto(
+                        taxRate.getYear(),
+                        taxRate.getStatus(),
+                        taxRate.getRangeStart().floatValue(),
+                        taxRate.getRangeEnd() != null ? taxRate.getRangeEnd().floatValue(): 0,
+                        taxRate.getRate(),
+                        taxRate.getNote()
+                ))
+                .toList();
+    }
+
+    public List<TaxRateDto> getRates(int year, FilingStatus status) {
+        if (status == null) {
+            return getTaxRateByYear(year);
+        } else {
+            return getTaxRateByYearAndStatus(year, status);
+        }
     }
 
     // get the tax rates by year, status and all ranges less than or equal to the income
@@ -80,8 +88,12 @@ public class TaxService {
         for (TaxRate taxRate : taxRates) {
             float taxPaid;
             if (income > taxRate.getRangeStart().floatValue()) {
-                float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
-                taxPaid = (rangeEnd - taxRate.getRangeStart().floatValue()) * (taxRate.getRate());
+                if (taxRate.getRangeEnd() == null) {
+                    taxPaid = (income - taxRate.getRangeStart().floatValue()) * (taxRate.getRate());
+                } else {
+                    float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
+                    taxPaid = (rangeEnd - taxRate.getRangeStart().floatValue()) * (taxRate.getRate());
+                }
                 taxPaidPerBracket.add(taxPaid);
             }
         }
@@ -104,7 +116,7 @@ public class TaxService {
         for (int i = 0; i < taxRates.size(); i++) {
             TaxRate taxRate = taxRates.get(i);
             float rangeStart = taxRate.getRangeStart().floatValue();
-            float rangeEnd = Math.min(income, taxRate.getRangeEnd().floatValue());
+            float rangeEnd = taxRate.getRangeEnd() != null ? Math.min(income, taxRate.getRangeEnd().floatValue()) : income;
             float taxPaid = taxPaidPerBracket.get(i);
 
             TaxPaidInfo info = new TaxPaidInfo(taxInput.getYear(), taxInput.getStatus(), rangeStart, rangeEnd, taxRate.getRate(), taxPaid);
@@ -144,7 +156,7 @@ public class TaxService {
 
 
     public TaxSummaryResponse getSummary(int year, FilingStatus status) {
-        List<TaxRate> taxRates = getTaxRateByYearAndStatus(year, status);
+        List<TaxRate> taxRates = taxRateRepo.findByYearAndStatus(year, status);
         int bracketCount = taxRates.size();
 
         BigDecimal minThreshold = taxRates.stream()
@@ -154,6 +166,7 @@ public class TaxService {
 
         BigDecimal maxThreshold = taxRates.stream()
                 .map(TaxRate::getRangeEnd)
+                .filter(Objects::nonNull)
                 .max(BigDecimal::compareTo)
                 .orElse(BigDecimal.ZERO);
 

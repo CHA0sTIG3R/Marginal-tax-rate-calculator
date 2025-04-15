@@ -40,12 +40,7 @@ public class CsvImportUtils {
                     continue;
                 }
 
-                if (line[1].equalsIgnoreCase("No income tax")) {
-                    continue;
-                }
-
                 String yearStr = (Objects.equals(line[0], "1940(A)"))? parseYear1940Entry(line[0]) : line[0];
-
                 Integer year = Integer.valueOf(yearStr);
 
                 insertTaxRate(year, FilingStatus.MFJ, line[1], line[3], line[13]);
@@ -80,10 +75,13 @@ public class CsvImportUtils {
             list.sort(Comparator.comparing(BracketEntry::getRangeStart));
 
             for (int i = 0; i < list.size(); i++){
-                if (i < list.size() - 1){
-                    list.get(i).setRangeEnd(list.get(i+1).getRangeStart());
-                }else {
-                    list.get(i).setRangeEnd(null);
+                BracketEntry be = list.get(i);
+                if (be.getRate() == 0f) {
+                    be.setRangeEnd(be.getRangeStart());
+                } else if (i < list.size() - 1){
+                    be.setRangeEnd(list.get(i+1).getRangeStart());
+                } else {
+                    be.setRangeEnd(null);
                 }
             }
         }
@@ -100,9 +98,12 @@ public class CsvImportUtils {
      * @param note A note associated with the tax rate.
      */
     private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart, String note) {
-        Float rate = (!Objects.equals(rawRate, ""))? Float.parseFloat(rawRate.replace("%", "")) / 100 : 0f;
 
-        BigDecimal start = (!Objects.equals(rawStart, ""))? parseDollarValue(rawStart) : BigDecimal.ZERO;
+        boolean isNoIncomeTax = rawRate == null || rawRate.isBlank() || rawRate.equalsIgnoreCase("No income tax");
+
+        Float rate = isNoIncomeTax ? 0f : Float.parseFloat(rawRate.replace("%", "").trim()) / 100;
+
+        BigDecimal start = isNoIncomeTax ? BigDecimal.ZERO : parseDollarValue(rawStart);
 
         BracketEntry bracketEntry = new BracketEntry();
         bracketEntry.setYear(year);

@@ -2,7 +2,6 @@ package com.project.marginal.tax.calculator.controller;
 
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
-import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.service.TaxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,13 +28,9 @@ public class TaxController {
     }
 
     @GetMapping("/rate")
-    public List<TaxRate> getTaxRateByYear(@RequestParam String year,
-                                          @RequestParam(required = false) FilingStatus status) {
-        if (status == null) {
-            return service.getTaxRateByYear(Integer.parseInt(year));
-        } else {
-            return service.getTaxRateByYearAndStatus(Integer.parseInt(year), status);
-        }
+    public List<TaxRateDto> getRate(@RequestParam int year,
+                                    @RequestParam(required = false) FilingStatus status) {
+        return service.getRates(year, status);
     }
 
     @PostMapping("/breakdown")

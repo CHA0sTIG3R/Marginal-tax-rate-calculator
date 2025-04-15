@@ -56,7 +56,7 @@ public class ControllerTests {
                 .andExpect(content().json("{}"));
     }
 
-    // Test the getTaxRateByYear endpoint
+    // Test the getRate endpoint
     @Test
     public void testGetTaxRateByYearEndpoint() throws Exception {
         mockMvc.perform(get("/get-tax-rate/2021"))
