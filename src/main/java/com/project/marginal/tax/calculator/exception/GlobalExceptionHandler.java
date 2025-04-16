@@ -1,4 +1,3 @@
-// src/main/java/com/project/marginal/tax/calculator/exception/GlobalExceptionHandler.java
 package com.project.marginal.tax.calculator.exception;
 
 import jakarta.servlet.http.HttpServletRequest;

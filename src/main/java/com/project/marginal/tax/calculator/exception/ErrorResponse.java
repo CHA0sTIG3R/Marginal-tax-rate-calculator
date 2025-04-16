@@ -1,4 +1,3 @@
-// src/main/java/com/project/marginal/tax/calculator/exception/ErrorResponse.java
 package com.project.marginal.tax.calculator.exception;
 
 import java.time.LocalDateTime;
