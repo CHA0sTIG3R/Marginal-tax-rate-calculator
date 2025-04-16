@@ -29,23 +29,23 @@ public class TaxController {
 
     @GetMapping("/rate")
     public List<TaxRateDto> getRate(@RequestParam int year,
-                                    @RequestParam(required = false) FilingStatus status) {
+                                    @RequestParam(required = false) FilingStatus status) throws IllegalArgumentException {
         return service.getRates(year, status);
     }
 
     @PostMapping("/breakdown")
-    public TaxPaidResponse getTaxBreakdown(@RequestBody TaxInput taxInput) {
+    public TaxPaidResponse getTaxBreakdown(@RequestBody TaxInput taxInput) throws IllegalArgumentException {
         return service.calculateTaxBreakdown(taxInput);
     }
 
     @GetMapping("/notes")
-    public TaxNoteResponse getNote(@RequestParam String year) {
+    public TaxNoteResponse getNote(@RequestParam String year) throws IllegalArgumentException {
         String note = service.getNoteByYear(Integer.parseInt(year));
         return new TaxNoteResponse(Integer.parseInt(year), note);
     }
 
     @GetMapping("/summary")
-    public TaxSummaryResponse getSummary(@RequestParam int year, @RequestParam FilingStatus status) {
+    public TaxSummaryResponse getSummary(@RequestParam int year, @RequestParam FilingStatus status) throws IllegalArgumentException {
         return service.getSummary(year, status);
     }
 }

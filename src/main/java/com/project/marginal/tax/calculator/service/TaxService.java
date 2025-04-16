@@ -18,8 +18,16 @@ import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.perc
 @Service
 public class TaxService {
 
+    int MIN_YEAR = 1862;
+    int MAX_YEAR = 2021;
+
     @Autowired
     private TaxRateRepository taxRateRepo;
+
+    // check if year in taxInput is between 1862 and 2021
+    private boolean isValidYear(int year) {
+        return year >= MIN_YEAR && year <= MAX_YEAR;
+    }
 
     public List<Integer> listYears() {
         return taxRateRepo.findAll().stream()
@@ -62,6 +70,11 @@ public class TaxService {
     }
 
     public List<TaxRateDto> getRates(int year, FilingStatus status) {
+        // Check if the year is valid
+        if (!isValidYear(year)) {
+            throw new IllegalArgumentException("Invalid year: " + year);
+        }
+
         if (status == null) {
             return getTaxRateByYear(year);
         } else {
@@ -70,13 +83,13 @@ public class TaxService {
     }
 
     // get the tax rates by year, status and all ranges less than or equal to the income
-    public List<TaxRate> getTaxRateByYearAndStatusAndRangeStartLessThanEqual(int year, FilingStatus status, float income) {
-        return taxRateRepo.findByYearAndStatusAndRangeStartLessThanEqual(year, status, new BigDecimal(income));
+    public List<TaxRate> getTaxRateByYearAndStatusAndRangeStartLessThan(int year, FilingStatus status, float income) {
+        return taxRateRepo.findByYearAndStatusAndRangeStartLessThan(year, status, new BigDecimal(income));
     }
 
     // calculate the tax for a given income
     public List<Float> calculateTax(TaxInput taxInput) {
-        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(
+        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThan(
                 taxInput.getYear(),
                 taxInput.getStatus(),
                 taxInput.getIncome()
@@ -103,7 +116,7 @@ public class TaxService {
 
     // get tax paid information
     public List<TaxPaidInfo> getTaxPaidInfo(TaxInput taxInput) {
-        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThanEqual(
+        List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThan(
                 taxInput.getYear(),
                 taxInput.getStatus(),
                 taxInput.getIncome()
@@ -136,6 +149,12 @@ public class TaxService {
 
     // calculate tax breakdown
     public TaxPaidResponse calculateTaxBreakdown(TaxInput taxInput) {
+
+        // Check if the year is valid and the rate is not 0
+        if (!isValidYear(taxInput.getYear())) {
+            throw new IllegalArgumentException("Invalid year: " + taxInput.getYear());
+        }
+
         List<TaxPaidInfo> taxPaidInfos = getTaxPaidInfo(taxInput);
         float totalTaxPaid = getTotalTaxPaid(taxInput);
         float avgRate = totalTaxPaid / taxInput.getIncome();
@@ -147,6 +166,12 @@ public class TaxService {
      * @return the legislative note for the given year, or a default message if none.
      */
     public String getNoteByYear(int year) {
+
+        // Check if the year is valid
+        if (!isValidYear(year)) {
+            throw new IllegalArgumentException("Invalid year: " + year);
+        }
+
         return taxRateRepo.findNoteByYear(year).stream()
                 .map(TaxRate::getNote)
                 .filter(n -> !n.isBlank())
@@ -155,7 +180,13 @@ public class TaxService {
     }
 
 
-    public TaxSummaryResponse getSummary(int year, FilingStatus status) {
+    public TaxSummaryResponse getSummary(int year, FilingStatus status) throws IllegalArgumentException {
+
+        // Check if the year is valid
+        if (!isValidYear(year)) {
+            throw new IllegalArgumentException("Invalid year: " + year);
+        }
+
         List<TaxRate> taxRates = taxRateRepo.findByYearAndStatus(year, status);
         int bracketCount = taxRates.size();
 
@@ -175,7 +206,7 @@ public class TaxService {
                 .average()
                 .orElse(0.0);
 
-        String averageRate = percentFormat(avgRateRaw);
+        String averageRate = avgRateRaw == 0.0 ? "No Income Tax" : percentFormat(avgRateRaw);
         String note = getNoteByYear(year);
 
         return new TaxSummaryResponse(year, status, bracketCount, minThreshold, maxThreshold, averageRate, note);
