@@ -60,7 +60,7 @@ public class RepositoryTests {
     }
 
     @Test
-    public void testFindByYearAndStatusAndRangeStartLessThanEqual() {
+    public void testFindByYearAndStatusAndRangeStartLessThan() {
         Integer year = 2021;
         FilingStatus status = FilingStatus.S;
         BigDecimal rangeStart = new BigDecimal("50000.00");
