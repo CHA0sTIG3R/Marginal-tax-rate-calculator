@@ -153,5 +153,5 @@ src/main/java/com/project/marginal/tax/calculator
 
 ## License
 
-This project is licensed under the MIT License — see `LICENSE` for details.
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
 
