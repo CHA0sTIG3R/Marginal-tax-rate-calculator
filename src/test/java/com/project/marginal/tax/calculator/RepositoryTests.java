@@ -65,7 +65,7 @@ public class RepositoryTests {
         FilingStatus status = FilingStatus.S;
         BigDecimal rangeStart = new BigDecimal("50000.00");
 
-        List<TaxRate> taxRates = taxRateRepository.findByYearAndStatusAndRangeStartLessThanEqual(year, status, rangeStart);
+        List<TaxRate> taxRates = taxRateRepository.findByYearAndStatusAndRangeStartLessThan(year, status, rangeStart);
         assertNotNull(taxRates);
         assertEquals(86375.00, taxRates.get(taxRates.size() - 1).getRangeEnd().doubleValue(), 0.01); // Check the last entry's rangeEnd
         assertEquals(0.00, taxRates.get(0).getRangeStart().doubleValue(), 0.01); // Check the first entry's rangeStart

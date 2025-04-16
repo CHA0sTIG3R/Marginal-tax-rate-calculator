@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Repository interface for managing TaxRate entities.
@@ -23,7 +22,7 @@ public interface TaxRateRepository extends JpaRepository<TaxRate, Long> {
     List<TaxRate> findByStatus(FilingStatus status);
     List<TaxRate> findByYearAndStatus(Integer year, FilingStatus status);
 
-    List<TaxRate> findByYearAndStatusAndRangeStartLessThanEqual(
+    List<TaxRate> findByYearAndStatusAndRangeStartLessThan(
             Integer year, FilingStatus status, BigDecimal rangeStart
     );
 

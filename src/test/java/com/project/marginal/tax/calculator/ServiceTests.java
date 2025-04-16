@@ -1,6 +1,5 @@
 package com.project.marginal.tax.calculator;
 
-import com.project.marginal.tax.calculator.dto.TaxRateDto;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.dto.TaxInput;
 import com.project.marginal.tax.calculator.dto.TaxPaidInfo;
@@ -60,10 +59,10 @@ public class ServiceTests {
         System.out.println(taxService.listYears());
     }
 
-    // test getTaxRateByYearAndStatusAndRangeStartLessThanEqual
+    // test getTaxRateByYearAndStatusAndRangeStartLessThan
     @Test
     public void testGetTaxRateByYearAndStatusAndRangeStartLessThanEqual() {
-        List<TaxRate> taxRates = taxService.getTaxRateByYearAndStatusAndRangeStartLessThanEqual(2021, FilingStatus.S, 50000);
+        List<TaxRate> taxRates = taxService.getTaxRateByYearAndStatusAndRangeStartLessThan(2021, FilingStatus.S, 50000);
         assertNotNull(taxRates);
         assertFalse(taxRates.isEmpty());
         assertEquals(3, taxRates.size());

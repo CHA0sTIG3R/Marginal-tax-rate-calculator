@@ -99,7 +99,11 @@ public class CsvImportUtils {
      */
     private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart, String note) {
 
-        boolean isNoIncomeTax = rawRate == null || rawRate.isBlank() || rawRate.equalsIgnoreCase("No income tax");
+        boolean isNoIncomeTax = rawRate == null || rawRate.equalsIgnoreCase("No income tax");
+
+        if (rawStart.isBlank() && rawRate.isBlank() && !isNoIncomeTax) {
+            return;
+        }
 
         Float rate = isNoIncomeTax ? 0f : Float.parseFloat(rawRate.replace("%", "").trim()) / 100;
 
