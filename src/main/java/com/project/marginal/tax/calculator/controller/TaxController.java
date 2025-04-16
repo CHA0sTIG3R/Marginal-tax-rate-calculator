@@ -14,8 +14,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/tax")
 public class TaxController {
 
-    @Autowired
-    private TaxService service;
+    private final TaxService service;
+
+    public TaxController(TaxService service) {
+        this.service = service;
+    }
 
     @GetMapping("/years")
     public List<Integer> getYears() {

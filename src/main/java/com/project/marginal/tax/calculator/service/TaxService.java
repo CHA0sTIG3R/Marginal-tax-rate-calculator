@@ -21,8 +21,11 @@ public class TaxService {
     int MIN_YEAR = 1862;
     int MAX_YEAR = 2021;
 
-    @Autowired
-    private TaxRateRepository taxRateRepo;
+    private final TaxRateRepository taxRateRepo;
+
+    public TaxService(TaxRateRepository taxRateRepo) {
+        this.taxRateRepo = taxRateRepo;
+    }
 
     // check if year in taxInput is between 1862 and 2021
     private boolean isNotValidYear(int year) {
