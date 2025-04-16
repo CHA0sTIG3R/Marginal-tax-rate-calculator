@@ -25,8 +25,8 @@ public class TaxService {
     private TaxRateRepository taxRateRepo;
 
     // check if year in taxInput is between 1862 and 2021
-    private boolean isValidYear(int year) {
-        return year >= MIN_YEAR && year <= MAX_YEAR;
+    private boolean isNotValidYear(int year) {
+        return year < MIN_YEAR || year > MAX_YEAR;
     }
 
     public List<Integer> listYears() {
@@ -71,7 +71,7 @@ public class TaxService {
 
     public List<TaxRateDto> getRates(int year, FilingStatus status) {
         // Check if the year is valid
-        if (!isValidYear(year)) {
+        if (isNotValidYear(year)) {
             throw new IllegalArgumentException("Invalid year: " + year);
         }
 
@@ -151,7 +151,7 @@ public class TaxService {
     public TaxPaidResponse calculateTaxBreakdown(TaxInput taxInput) {
 
         // Check if the year is valid and the rate is not 0
-        if (!isValidYear(taxInput.getYear())) {
+        if (isNotValidYear(taxInput.getYear())) {
             throw new IllegalArgumentException("Invalid year: " + taxInput.getYear());
         }
 
@@ -168,7 +168,7 @@ public class TaxService {
     public String getNoteByYear(int year) {
 
         // Check if the year is valid
-        if (!isValidYear(year)) {
+        if (isNotValidYear(year)) {
             throw new IllegalArgumentException("Invalid year: " + year);
         }
 
@@ -183,7 +183,7 @@ public class TaxService {
     public TaxSummaryResponse getSummary(int year, FilingStatus status) throws IllegalArgumentException {
 
         // Check if the year is valid
-        if (!isValidYear(year)) {
+        if (isNotValidYear(year)) {
             throw new IllegalArgumentException("Invalid year: " + year);
         }
 
