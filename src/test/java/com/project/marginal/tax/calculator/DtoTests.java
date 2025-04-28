@@ -47,8 +47,8 @@ public class DtoTests {
     @Test
     public void testTaxNoteResponse() {
         TaxNoteResponse response = new TaxNoteResponse(2021, "Test legislative note");
-        assertEquals(2021, response.getYear());
-        assertEquals("Test legislative note", response.getNote());
+        assertEquals(2021, response.year());
+        assertEquals("Test legislative note", response.note());
     }
 
     @Test
@@ -62,10 +62,10 @@ public class DtoTests {
                 "24%",
                 "Summary Note"
         );
-        assertEquals(2021, summary.getYear());
-        assertEquals(FilingStatus.MFJ, summary.getStatus());
-        assertEquals(4, summary.getBracketCount());
-        assertEquals("24%", summary.getAverageRate());
+        assertEquals(2021, summary.year());
+        assertEquals(FilingStatus.MFJ, summary.status());
+        assertEquals(4, summary.bracketCount());
+        assertEquals("24%", summary.averageRate());
     }
 
     @Test

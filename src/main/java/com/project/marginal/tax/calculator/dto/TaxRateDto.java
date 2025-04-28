@@ -17,12 +17,12 @@ import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.doll
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
 public class TaxRateDto {
-    private Integer year;
-    private FilingStatus filingStatus;
-    private String rangeStart;
-    private String rangeEnd;
-    private String rate;
-    private String note;
+    private final Integer year;
+    private final FilingStatus filingStatus;
+    private final String rangeStart;
+    private final String rangeEnd;
+    private final String rate;
+    private final String note;
 
     public TaxRateDto(int year, FilingStatus filingStatus, float rangeStart, float rangeEnd, float rate, String note) {
         this.year = year;

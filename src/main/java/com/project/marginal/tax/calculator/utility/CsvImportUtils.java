@@ -32,7 +32,7 @@ public class CsvImportUtils {
 
     /**
      * This method is used to import tax rates from a CSV file.
-     * It reads the CSV file, parses the data, and populates the rates list with BracketEntry objects.
+     * It reads the CSV file, parses the data, and populates the rate list with BracketEntry objects.
      *
      * @param filePath The path to the CSV file.
      * @return A list of BracketEntry objects representing the tax rates.
@@ -99,7 +99,7 @@ public class CsvImportUtils {
     }
 
     /**
-     * This method is used to insert a tax rate into the rates list.
+     * This method is used to insert a tax rate into the rate list.
      * It creates a new BracketEntry object and sets its properties based on the provided parameters.
      *
      * @param year The year of the tax rate.
@@ -112,8 +112,11 @@ public class CsvImportUtils {
 
         boolean isNoIncomeTax = rawRate == null || rawRate.equalsIgnoreCase("No income tax");
 
-        if (rawStart.isBlank() && rawRate.isBlank() && !isNoIncomeTax) {
-            return;
+        if (rawStart.isBlank()) {
+            assert rawRate != null;
+            if (rawRate.isBlank() && !isNoIncomeTax) {
+                return;
+            }
         }
 
         Float rate = isNoIncomeTax ? 0f : Float.parseFloat(rawRate.replace("%", "").trim()) / 100;
@@ -133,7 +136,7 @@ public class CsvImportUtils {
      * This method is used to parse the dollar value from a string.
      * It removes the dollar sign and commas, and converts it to a BigDecimal.
      *
-     * @param dollarStr The dollar string to be parsed.
+     * @param dollarStr The dollar strings to be parsed.
      * @return The parsed BigDecimal value.
      */
     private BigDecimal parseDollarValue(String dollarStr) {

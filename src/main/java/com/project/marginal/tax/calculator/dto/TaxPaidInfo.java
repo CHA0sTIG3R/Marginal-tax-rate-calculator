@@ -25,12 +25,12 @@ import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.perc
 public class TaxPaidInfo {
     private Integer year;
     private FilingStatus status;
-    private String rangeStart;
-    private String rangeEnd;
-    private String taxRate;
-    private String taxPaid;
+    private final String rangeStart;
+    private final String rangeEnd;
+    private final String taxRate;
+    private final String taxPaid;
 
-    public TaxPaidInfo(Integer year, FilingStatus status, float rangeStart, float rangeEnd, float taxRate, float taxPaid) {
+    public TaxPaidInfo(int year, FilingStatus status, float rangeStart, float rangeEnd, float taxRate, float taxPaid) {
         this.year = year;
         this.status = status;
         this.rangeStart = dollarFormat(rangeStart);
@@ -57,34 +57,6 @@ public class TaxPaidInfo {
 
     public String getRangeStart() {
         return rangeStart;
-    }
-
-    public void setRangeStart(String rangeStart) {
-        this.rangeStart = rangeStart;
-    }
-
-    public String getRangeEnd() {
-        return rangeEnd;
-    }
-
-    public void setRangeEnd(String rangeEnd) {
-        this.rangeEnd = rangeEnd;
-    }
-
-    public String getTaxRate() {
-        return taxRate;
-    }
-
-    public void setTaxRate(String taxRate) {
-        this.taxRate = taxRate;
-    }
-
-    public String getTaxPaid() {
-        return taxPaid;
-    }
-
-    public void setTaxPaid(String taxPaid) {
-        this.taxPaid = taxPaid;
     }
 
     @Override
