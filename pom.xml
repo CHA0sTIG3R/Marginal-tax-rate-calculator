@@ -16,7 +16,12 @@
 	<description>Finals project </description>
 	<url/>
 	<licenses>
-		<license/>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>Apache License, Version 2.0</comments>
+		</license>
 	</licenses>
 	<developers>
 		<developer/>
