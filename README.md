@@ -50,18 +50,16 @@ A Spring Boot REST API that provides historical United States income tax rates (
 
 - JDK 17 or higher
 - Maven 3.8+
-- A relational database (H2, PostgreSQL (currently using), MySQL) or use the default H2 in-memory
+- A relational database (H2, PostgreSQL (current choice), MySQL) or use the default H2 in-memory
 
 ### Installation
 
-1. **Clone the repository**:
+**Clone the repository**:
 
    ```bash
    git clone https://github.com/CHA0sTIG3R/Marginal-tax-rate-calculator.git
    cd Marginal-tax-rate-calculator
    ```
-
-2. **Place the CSV data**: The historical data file should be located at `src/main/resources/static/Historical Income Tax Rates and Brackets, 1862-2021.csv`.
 
 ### Configuration
 
@@ -78,6 +76,8 @@ spring.jpa.hibernate.ddl-auto=update
 
 # Import on startup (profile 'data-import' must be active)
 tax.import-on-startup=true
+# Public URL where the CSV lives
+tax.data-url=https://raw.githubusercontent.com/CHA0sTIG3R/tax-data/refs/heads/main/Historical%20Income%20Tax%20Rates%20and%20Brackets%2C%201862-2021.csv
 ```
 
 Activate the data-import profile when you run:
@@ -153,5 +153,5 @@ src/main/java/com/project/marginal/tax/calculator
 
 ## License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+This project is licensed under the Apache License — see [LICENSE](LICENSE) for details.
 
