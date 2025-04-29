@@ -18,10 +18,7 @@ import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
@@ -223,5 +220,61 @@ public class TaxService {
         String note = getNoteByYear(year);
 
         return new TaxSummaryResponse(year, status, bracketCount, minThreshold, maxThreshold, averageRate, note);
+    }
+
+    public List<YearMetric> getHistory(
+            FilingStatus status,
+            String metric,
+            Integer startYear,
+            Integer endYear
+    ) {
+        if (isNotValidYear(startYear) || isNotValidYear(endYear)) {
+            throw new IllegalArgumentException("Invalid year range: " + startYear + " - " + endYear);
+        }
+
+        List<Integer> years = taxRateRepo.findByStatus(status).stream()
+                .map(TaxRate::getYear)
+                .distinct()
+                .sorted()
+                .filter(year -> year >= startYear && year <= endYear)
+                .toList();
+
+        return years.stream().map(y -> {
+            List<TaxRate> rates = taxRateRepo.findByYearAndStatus(y, status);
+            String val;
+            switch (metric) {
+                case "topRate" -> {
+                    double maxRate = rates.stream()
+                            .mapToDouble(TaxRate::getRate)
+                            .max()
+                            .orElse(0.0);
+                    val = percentFormat(maxRate);
+                }
+
+                case "minRate" -> {
+                    double minRate = rates.stream()
+                            .mapToDouble(TaxRate::getRate)
+                            .min()
+                            .orElse(0.0);
+                    val = percentFormat(minRate);
+                }
+
+                case "avgRate" -> {
+                    double avgRate = rates.stream()
+                            .mapToDouble(TaxRate::getRate)
+                            .average()
+                            .orElse(0.0);
+                    val = percentFormat(avgRate);
+                }
+
+                case "bracketCount" -> {
+                    int bracketCount = rates.size();
+                    val = String.valueOf(bracketCount);
+                }
+
+            default -> throw new IllegalArgumentException("unsupported metric: " + metric);
+        }
+        return new YearMetric(y, metric, val);
+        }).toList();
     }
 }

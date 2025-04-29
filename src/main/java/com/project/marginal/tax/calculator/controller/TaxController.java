@@ -61,4 +61,12 @@ public class TaxController {
     public TaxSummaryResponse getSummary(@RequestParam int year, @RequestParam FilingStatus status) throws IllegalArgumentException {
         return service.getSummary(year, status);
     }
+
+    @GetMapping("/history")
+    public List<YearMetric> getHistory(@RequestParam FilingStatus status,
+                                       @RequestParam(defaultValue = "topRate") String metric,
+                                       @RequestParam Integer startYear,
+                                       @RequestParam Integer endYear) throws IllegalArgumentException {
+        return service.getHistory(status, metric, startYear, endYear);
+    }
 }
