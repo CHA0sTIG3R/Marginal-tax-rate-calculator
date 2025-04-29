@@ -18,6 +18,9 @@ public class TaxInput {
     private FilingStatus status;
     private Float income;
 
+    public TaxInput() {
+    }
+
     public TaxInput(Integer year, FilingStatus status, String income) {
         this.year = year;
         this.status = status;
