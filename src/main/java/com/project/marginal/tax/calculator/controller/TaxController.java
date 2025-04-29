@@ -65,8 +65,13 @@ public class TaxController {
     @GetMapping("/history")
     public List<YearMetric> getHistory(@RequestParam FilingStatus status,
                                        @RequestParam(defaultValue = "topRate") String metric,
-                                       @RequestParam Integer startYear,
-                                       @RequestParam Integer endYear) throws IllegalArgumentException {
+                                       @RequestParam(defaultValue = "1862") Integer startYear,
+                                       @RequestParam(defaultValue = "2021") Integer endYear) throws IllegalArgumentException {
         return service.getHistory(status, metric, startYear, endYear);
+    }
+
+    @PostMapping("/simulate")
+    public List<TaxPaidResponse> simulate(@RequestBody List<TaxInput> taxInputs) throws IllegalArgumentException {
+        return service.simulateBulk(taxInputs);
     }
 }

@@ -277,4 +277,10 @@ public class TaxService {
         return new YearMetric(y, metric, val);
         }).toList();
     }
+
+    public List<TaxPaidResponse> simulateBulk(List<TaxInput> taxInputs) {
+        return taxInputs.stream()
+                .map(this::calculateTaxBreakdown)
+                .toList();
+    }
 }
