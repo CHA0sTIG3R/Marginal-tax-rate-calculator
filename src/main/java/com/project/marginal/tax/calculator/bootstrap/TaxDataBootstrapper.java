@@ -18,6 +18,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
+import java.net.URL;
+
 @Component
 @Profile("data-import")
 public class TaxDataBootstrapper implements CommandLineRunner {
@@ -28,6 +31,9 @@ public class TaxDataBootstrapper implements CommandLineRunner {
     @Value("${tax.import-on-startup:false}")
     private boolean importOnStartup;
 
+    @Value("${tax.data-url}")
+    private String dataUrl;
+
     public TaxDataBootstrapper(TaxDataImportService importer, TaxRateRepository repo) {
         this.importer = importer;
         this.repo = repo;
@@ -35,14 +41,19 @@ public class TaxDataBootstrapper implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (!importOnStartup) return;
+        if (!importOnStartup || repo.count() > 0) return;
 
-        if (repo.count() == 0) {
-            importer.importData("src/main/resources/static/Historical Income Tax Rates and Brackets, 1862-2021.csv");
-            System.out.println("✔ Historical tax rates imported.");
+        System.out.println("Fetching data from " + dataUrl);
+
+        try (InputStream in = new URL(dataUrl).openStream()) {
+            importer.importData(in);
+            System.out.println("✔ Tax rates imported from remote CSV.");
         }
-        else {
-            System.out.println("ℹ Tax rates table already populated; skipping import.");
+        catch (Exception e) {
+            System.err.println("✘ Failed to import tax rates: " + e.getMessage());
+        }
+        finally {
+            System.out.println("✔ Tax rates import process completed.");
         }
     }
 }

@@ -19,10 +19,10 @@ import com.project.marginal.tax.calculator.dto.YearStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 @Component
@@ -39,8 +39,8 @@ public class CsvImportUtils {
      * @throws IOException If an I/O error occurs while reading the file.
      * @throws CsvValidationException If a CSV validation error occurs.
      */
-    public List<BracketEntry> importCsv(String filePath) throws IOException, CsvValidationException {
-        try (Reader reader = Files.newBufferedReader(Paths.get(filePath))){
+    public List<BracketEntry> importFromStream(InputStream in) throws IOException, CsvValidationException {
+        try (Reader reader = new InputStreamReader(in)){
             CSVReader csvReader = new CSVReader(reader);
 
             csvReader.readNext();

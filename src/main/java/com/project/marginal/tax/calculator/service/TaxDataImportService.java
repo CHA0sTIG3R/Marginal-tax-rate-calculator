@@ -19,6 +19,7 @@ import com.project.marginal.tax.calculator.utility.CsvImportUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -32,8 +33,8 @@ public class TaxDataImportService {
         this.repo = repo;
     }
 
-    public void importData(String filePath) throws CsvValidationException, IOException {
-        List<BracketEntry> entries = csvUtil.importCsv(filePath);
+    public void importData(InputStream in) throws CsvValidationException, IOException {
+        List<BracketEntry> entries = csvUtil.importFromStream(in);
         for (BracketEntry entry : entries) {
             TaxRate tr = new TaxRate();
             tr.setYear(entry.getYear());
