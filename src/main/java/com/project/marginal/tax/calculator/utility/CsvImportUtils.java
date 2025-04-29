@@ -34,7 +34,7 @@ public class CsvImportUtils {
      * This method is used to import tax rates from a CSV file.
      * It reads the CSV file, parses the data, and populates the rate list with BracketEntry objects.
      *
-     * @param filePath The path to the CSV file.
+     * @param in The path to the CSV file.
      * @return A list of BracketEntry objects representing the tax rates.
      * @throws IOException If an I/O error occurs while reading the file.
      * @throws CsvValidationException If a CSV validation error occurs.

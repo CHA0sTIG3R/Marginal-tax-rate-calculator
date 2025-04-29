@@ -40,7 +40,7 @@ public class TaxDataBootstrapper implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (!importOnStartup || repo.count() > 0) return;
 
         System.out.println("Fetching data from " + dataUrl);
