@@ -42,9 +42,12 @@ public class TaxDataImportServiceTests {
         entry.setRate(0.10f);
         entry.setNote("Test note");
 
-        when(csvImportUtils.importCsv(anyString())).thenReturn(List.of(entry));
-        // When importer calls save on repo for each entry, we can verify that it was invoked.
-        importService.importData("dummyPath.csv");
+        List<BracketEntry> entries = List.of(entry);
+
+        when(csvImportUtils.importFromStream(any())).thenReturn(entries);
+        when(repo.save(any(TaxRate.class))).thenReturn(new TaxRate());
+        importService.importData(getClass().getResourceAsStream("/tax_rates.csv"));
+        verify(csvImportUtils, times(1)).importFromStream(any());
         verify(repo, times(1)).save(any(TaxRate.class));
     }
 

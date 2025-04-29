@@ -40,7 +40,7 @@ public class UtilityTests {
             writer.write("\"2021\",\"12.0%\",\">\",\"$19,900\",\"12.0%\",\">\",\"$9,950\",\"12.0%\",\">\",\"$9,950\",\"12.0%\",\">\",\"$14,200\",\"\"\n");
         }
         CsvImportUtils importer = new CsvImportUtils();
-        List<?> list = importer.importCsv(tempCsv.getAbsolutePath());
+        List<?> list = importer.importFromStream(tempCsv.toURI().toURL().openStream());
         // Expect a number of BracketEntry objects (could be 8 entries: one per filing status for each line)
         assertTrue(list.size() >= 2);
     }
