@@ -54,10 +54,19 @@ public class CsvImportUtils {
                 String yearStr = (Objects.equals(line[0], "1940(A)"))? parseYear1940Entry(line[0]) : line[0];
                 Integer year = Integer.valueOf(yearStr);
 
-                insertTaxRate(year, FilingStatus.MFJ, line[1], line[3], line[13]);
-                insertTaxRate(year, FilingStatus.MFS, line[4], line[6], line[13]);
-                insertTaxRate(year, FilingStatus.S, line[7], line[9], line[13]);
-                insertTaxRate(year, FilingStatus.HH, line[10], line[12], line[13]);
+
+                if (!line[1].isEmpty()) {
+                    insertTaxRate(year, FilingStatus.MFJ, line[1], line[3], line[13]);
+                }
+                if (!(line[4].isEmpty() && line[1].isEmpty())) {
+                    insertTaxRate(year, FilingStatus.MFS, line[4], line[6], line[13]);
+                }
+                if (!(line[7].isEmpty() && line[1].isEmpty())) {
+                    insertTaxRate(year, FilingStatus.S, line[7], line[9], line[13]);
+                }
+                if (!(line[10].isEmpty() && line[1].isEmpty())) {
+                    insertTaxRate(year, FilingStatus.HH, line[10], line[12], line[13]);
+                }
             }
         }
 
@@ -110,14 +119,7 @@ public class CsvImportUtils {
      */
     private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart, String note) {
 
-        boolean isNoIncomeTax = rawRate == null || rawRate.equalsIgnoreCase("No income tax");
-
-        if (rawStart.isBlank()) {
-            assert rawRate != null;
-            if (rawRate.isBlank() && !isNoIncomeTax) {
-                return;
-            }
-        }
+        boolean isNoIncomeTax = rawRate.isEmpty() || rawRate.equalsIgnoreCase("No income tax");
 
         Float rate = isNoIncomeTax ? 0f : Float.parseFloat(rawRate.replace("%", "").trim()) / 100;
 
