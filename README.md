@@ -15,9 +15,7 @@ A Spring Boot REST API that provides historical United States income tax rates (
     - [Running](#running)
 - [Data Import](#data-import)
 - [API Reference](#api-reference)
-- [Configuration Packages](#configuration-packages)
 - [Project Structure](#project-structure)
-- [Error Handling](#error-handling)
 - [Contributing](#contributing)
 - [License](#license)
 
