@@ -12,7 +12,7 @@ A Spring Boot REST API that provides historical United States income tax rates (
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
     - [Configuration](#configuration)
-    - [Running the Application](#running-the-application)
+    - [Running](#running)
 - [Data Import](#data-import)
 - [API Reference](#api-reference)
 - [Configuration Packages](#configuration-packages)
@@ -30,31 +30,32 @@ A Spring Boot REST API that provides historical United States income tax rates (
 - **Rate Lookup**: Fetch tax brackets and rates for a given year and optional filing status.
 - **Tax Breakdown**: Calculate detailed tax owed per bracket for a specified income.
 - **Summary**: Compute total tax, average rate, bracket count, thresholds, and legislative notes.
+- **Historical Metrics** – NEW!  Compare _top rate, minimum rate, average rate,_ or _bracket count_ across any year range.
+- **Bulk Simulation** – NEW!  POST an array of income scenarios and receive parallel breakdowns—perfect for what‑if tooling.
 - **Swagger UI**: Interactive API documentation at `/swagger-ui/index.html`.
 - **CORS Support**: Configurable cross-origin rules.
 
 ## Technology Stack
 
-- Java 17+
-- Spring Boot 3.x
-- Spring Data JPA
-- Jackson (for JSON serialization)
-- springdoc-openapi (Swagger / OpenAPI 3)
-- OpenCSV (CSV parsing)
-- Any JDBC-compatible database or H2 (default in-memory)
-- Maven build tool
+| Layer        | Choice                           |
+|--------------|----------------------------------|
+| Language     | **Java 17**                      |
+| Framework    | **Spring Boot 3**                |
+| Persistence  | Spring Data JPA + **PostgreSQL** |
+| CSV  Parsing | OpenCSV                          |
+| API  Docs    | springdoc‑openapi 3 / Swagger UI |
+| Build        | Maven                            |
+
 
 ## Getting Started
 
 ### Prerequisites
 
-- JDK 17 or higher
+- JDK 17+
 - Maven 3.8+
-- A relational database (H2, PostgreSQL (current choice), MySQL) or use the default H2 in-memory
+- Any relational database (H2 in-memory, or configure PostgreSQL/MySQL)
 
 ### Installation
-
-**Clone the repository**:
 
    ```bash
    git clone https://github.com/CHA0sTIG3R/Marginal-tax-rate-calculator.git
@@ -63,67 +64,53 @@ A Spring Boot REST API that provides historical United States income tax rates (
 
 ### Configuration
 
-Edit `src/main/resources/application.properties` (or `application.yml`) to configure your database and import behavior:
-
+Minimal settings live in `src/main/resources/application.properties` (or `application.yml`).  Example for H2:
 ```properties
-# DataSource settings (H2 example)
 spring.datasource.url=jdbc:h2:mem:taxdb;DB_CLOSE_DELAY=-1
 spring.datasource.username=sa
 spring.datasource.password=
 
-# JPA settings
 spring.jpa.hibernate.ddl-auto=update
 
-# Import on startup (profile 'data-import' must be active)
+# Import the CSV on first launch (requires profile `data-import`)
 tax.import-on-startup=true
-# Public URL where the CSV lives
-tax.data-url=https://raw.githubusercontent.com/CHA0sTIG3R/tax-data/refs/heads/main/Historical%20Income%20Tax%20Rates%20and%20Brackets%2C%201862-2021.csv
+tax.data-url=https://raw.githubusercontent.com/CHA0sTIG3R/tax-data/main/Historical%20Income%20Tax%20Rates%20and%20Brackets%2C%201862-2021.csv
 ```
 
-Activate the data-import profile when you run:
 
+### Running
+
+Import and boot the API in one step:
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=data-import
 ```
+Navigate to:
+- **Swagger UI** – <http://localhost:8080/swagger-ui/index.html>
+- **OpenAPI JSON** – <http://localhost:8080/v3/api-docs>
 
-### Running the Application
-
-Build and run:
-
-```bash
-mvn clean package
-java -jar target/marginal-tax-calculator-0.0.1-SNAPSHOT.jar --spring.profiles.active=data-import
-```
+## Data Import
+When the **`data-import`** profile is active _and_ the database is empty, **`TaxDataBootstrapper`** streams the canonical CSV from GitHub, converts rows via `CsvImportUtils`, and persists them through `TaxDataImportService`.
 
 Navigate to:
 
 - Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 - API Docs JSON: `http://localhost:8080/v3/api-docs`
 
-## Data Import
-
-On first startup (when the database is empty and `tax.import-on-startup=true`), the `TaxDataBootstrapper` loads bracket entries via `TaxDataImportService` and `CsvImportUtils`.
-
 ## API Reference
 
 Base path: `/api/v1/tax`
 
-| Endpoint                          | Method | Description                                                                                               |
-|-----------------------------------|--------|-----------------------------------------------------------------------------------------------------------|
-| `/years`                          | GET    | List all available tax years.                                                                             |
-| `/filing-status`                  | GET    | Get map of filing status codes to labels.                                                                 |
-| `/rate?year=<>&status=<optional>` | GET    | Retrieve tax brackets for a year and optional status.                                                     |
-| `/breakdown`                      | POST   | Calculate bracket-by-bracket tax breakdown. Request body: `{"year":2021,"status":"MFJ","income":"60000"}` |
-| `/notes?year=<>`                  | GET    | Retrieve legislative note for a given year.                                                               |
-| `/summary?year=<>&status=<>`      | GET    | Get summary: bracket count, thresholds, average rate, and note.                                           |
+| Endpoint                                                        | Method | Description                                                                                             |
+|-----------------------------------------------------------------|--------|---------------------------------------------------------------------------------------------------------|
+| `/years`                                                        | GET    | List all tax years.                                                                                     |
+| `/filing-status`                                                | GET    | Map of status codes → labels.                                                                           |
+| `/rate?year=2021&status=MFJ`                                    | GET    | Brackets for a year (optionally status).                                                                |
+| `/breakdown`                                                    | POST   | Bracket‑by‑bracket tax owed for one scenario. Body: `{ "year":2021, "status":"MFJ", "income":"60000" }` |
+| `/summary?year=2021&status=MFJ`                                 | GET    | Summary statistics + note.                                                                              |
+| `/notes?year=2021`                                              | GET    | Legislative note for the year.                                                                          |
+| `/history?status=S&metric=TOP_RATE&startYear=1913&endYear=2021` | GET    | NEW!  Year‑over‑year metric values.                                                                     |
+| `/simulate`                                                     | POST   | NEW!  Bulk tax breakdowns. Body: `[ {"year":2021,"status":"S","income":"45000"}, {...} ]`               |
 
-## Configuration Packages
-
-All custom configuration lives under `com.project.marginal.tax.calculator.config`:
-
-- `JacksonConfig`: Customizes the `ObjectMapper` (ISO dates, non-null inclusion, etc.).
-- `CorsConfig`: Defines CORS mappings, allowed origins/methods, and credential rules.
-- `SwaggerConfig`: Supplies an `OpenAPI` bean for title, version, and description of the API.
 
 ## Project Structure
 
@@ -131,18 +118,14 @@ All custom configuration lives under `com.project.marginal.tax.calculator.config
 src/main/java/com/project/marginal/tax/calculator
 ├── bootstrap      # Data import runner
 ├── config         # Jackson, CORS, Swagger configs
-├── controller     # REST controllers (TaxController)
+├── controller     # REST layer
 ├── dto            # Request/response DTOs
-├── entity         # JPA entities (TaxRate, FilingStatus)
-├── exception      # GlobalExceptionHandler, ErrorResponse
-├── repository     # Spring Data JPA repositories
-├── service        # Business logic (TaxService, TaxDataImportService)
-└── utility        # CSV import utils, number formatting, etc.
+├── entity         # JPA entities 
+├── exception      # Centralised error handling 
+├── repository     # Spring Data JPA interfaces
+├── service        # Business logic & CSV ingest
+└── utility        # Helpers (CSV parsing, number formatting)
 ```
-
-## Error Handling
-
-`GlobalExceptionHandler` (annotated with `@RestControllerAdvice`) converts exceptions like validation failures, type mismatches, and generic errors into clean HTTP responses using `ErrorResponse`.
 
 ## Contributing
 
@@ -153,5 +136,5 @@ src/main/java/com/project/marginal/tax/calculator
 
 ## License
 
-This project is licensed under the Apache License — see [LICENSE](LICENSE) for details.
+Apache 2.0 — see [`LICENSE`](LICENSE) for full text.
 
