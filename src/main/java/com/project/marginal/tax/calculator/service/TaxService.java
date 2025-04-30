@@ -224,7 +224,7 @@ public class TaxService {
 
     public List<YearMetric> getHistory(
             FilingStatus status,
-            String metric,
+            Metric metric,
             Integer startYear,
             Integer endYear
     ) {
@@ -243,31 +243,31 @@ public class TaxService {
             List<TaxRate> rates = taxRateRepo.findByYearAndStatus(y, status);
             String val;
             switch (metric) {
-                case "topRate" -> {
+                case TOP_RATE -> {
                     double maxRate = rates.stream()
                             .mapToDouble(TaxRate::getRate)
                             .max()
                             .orElse(0.0);
-                    val = percentFormat(maxRate);
+                    val = maxRate==0d? "No Income Tax" : percentFormat(maxRate);
                 }
 
-                case "minRate" -> {
+                case MIN_RATE -> {
                     double minRate = rates.stream()
                             .mapToDouble(TaxRate::getRate)
                             .min()
                             .orElse(0.0);
-                    val = percentFormat(minRate);
+                    val = minRate==0d? "No Income Tax" :  percentFormat(minRate);
                 }
 
-                case "avgRate" -> {
+                case AVERAGE_RATE -> {
                     double avgRate = rates.stream()
                             .mapToDouble(TaxRate::getRate)
                             .average()
                             .orElse(0.0);
-                    val = percentFormat(avgRate);
+                    val = avgRate==0d? "No Income Tax" :  percentFormat(avgRate);
                 }
 
-                case "bracketCount" -> {
+                case BRACKET_COUNT -> {
                     int bracketCount = rates.size();
                     val = String.valueOf(bracketCount);
                 }

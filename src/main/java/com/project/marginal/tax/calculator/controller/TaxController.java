@@ -64,7 +64,7 @@ public class TaxController {
 
     @GetMapping("/history")
     public List<YearMetric> getHistory(@RequestParam FilingStatus status,
-                                       @RequestParam(defaultValue = "topRate") String metric,
+                                       @RequestParam(defaultValue = "TOP_RATE") Metric metric,
                                        @RequestParam(defaultValue = "1862") Integer startYear,
                                        @RequestParam(defaultValue = "2021") Integer endYear) throws IllegalArgumentException {
         return service.getHistory(status, metric, startYear, endYear);

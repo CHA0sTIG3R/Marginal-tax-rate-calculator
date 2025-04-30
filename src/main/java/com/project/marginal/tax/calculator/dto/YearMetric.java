@@ -5,9 +5,9 @@ public class YearMetric {
     private final String metric;
     private final String value;
 
-    public YearMetric(Integer year, String metric, String value) {
+    public YearMetric(Integer year, Metric metric, String value) {
         this.year = year;
-        this.metric = metric;
+        this.metric = metric.name();
         this.value = value;
     }
 
