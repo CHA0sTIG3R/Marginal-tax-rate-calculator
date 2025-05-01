@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(controllers = TaxController.class)
-public class ControllerIntegrationTest {
+public class TaxControllerIntegrationTest {
 
     // Example:
     @Autowired
