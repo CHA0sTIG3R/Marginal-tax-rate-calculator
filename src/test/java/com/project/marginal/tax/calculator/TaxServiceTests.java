@@ -1,9 +1,7 @@
 package com.project.marginal.tax.calculator;
 
-import com.project.marginal.tax.calculator.dto.TaxPaidResponse;
-import com.project.marginal.tax.calculator.dto.TaxRateDto;
+import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
-import com.project.marginal.tax.calculator.dto.TaxInput;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import com.project.marginal.tax.calculator.service.TaxService;
@@ -14,9 +12,11 @@ import org.mockito.Mockito;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 
@@ -70,7 +70,7 @@ public class TaxServiceTests {
 
     @Test
     public void testCalculateTaxBreakdown() {
-        // Setup a simple scenario with a single tax bracket.
+        // Set up a simple scenario with a single tax bracket.
         TaxInput input = new TaxInput(2021, FilingStatus.S, "50000");
 
         TaxRate tr = new TaxRate();
@@ -89,5 +89,74 @@ public class TaxServiceTests {
         assertTrue(response.getTotalTaxPaid().contains("5,000"));
     }
 
+    @Test
+    public void testGetHistoryTopRate() {
+        // prepare fake TaxRate entries
+        TaxRate r2020a = new TaxRate();
+        r2020a.setYear(2020);
+        r2020a.setStatus(FilingStatus.S);
+        r2020a.setRangeStart(BigDecimal.ZERO);
+        r2020a.setRangeEnd(new BigDecimal("50000"));
+        r2020a.setRate(0.10f);
+        r2020a.setNote("Test note");
+        TaxRate r2020b = new TaxRate();
+        r2020b.setYear(2020);
+        r2020b.setStatus(FilingStatus.S);
+        r2020b.setRangeStart(new BigDecimal("50000"));
+        r2020b.setRangeEnd(new BigDecimal("100000"));
+        r2020b.setRate(0.15f);
+        r2020b.setNote("");
+        TaxRate r2021  = new TaxRate();
+        r2021.setYear(2021);
+        r2021.setStatus(FilingStatus.S);
+        r2021.setRangeStart(BigDecimal.ZERO);
+        r2021.setRangeEnd(new BigDecimal("75000"));
+        r2021.setRate(0.20f);
+        r2021.setNote("");
+
+        // findByStatus returns all three, which yields years [2020,2021]
+        when(repo.findByStatus(FilingStatus.S)).thenReturn(List.of(r2020a, r2020b, r2021));
+        // per‐year lookups:
+        when(repo.findByYearAndStatus(2020, FilingStatus.S)).thenReturn(List.of(r2020a, r2020b));
+        when(repo.findByYearAndStatus(2021, FilingStatus.S)).thenReturn(List.of(r2021));
+
+        List<YearMetric> metrics = service.getHistory(FilingStatus.S, Metric.TOP_RATE, 2020, 2021);
+        assertEquals(2, metrics.size());
+
+        YearMetric m2020 = metrics.get(0);
+        assertEquals(2020, m2020.getYear());
+        assertEquals("TOP_RATE", m2020.getMetric());
+        assertEquals(percentFormat(0.15f), m2020.getValue());
+
+        YearMetric m2021 = metrics.get(1);
+        assertEquals(2021, m2021.getYear());
+        assertEquals("TOP_RATE", m2021.getMetric());
+        assertEquals(percentFormat(0.20f), m2021.getValue());
+    }
+
+    @Test
+    public void testGetHistoryUnsupportedMetricThrows() {
+        when(repo.findByStatus(FilingStatus.S)).thenReturn(List.of());
+        assertThrows(IllegalArgumentException.class,
+                () -> service.getHistory(FilingStatus.S, Metric.valueOf("new metric"), 2020, 2021));
+    }
+
+    @Test
+    public void testSimulateBulk() {
+        // Spy on service so we can stub calculateTaxBreakdown
+        TaxService spySvc = Mockito.spy(service);
+        TaxPaidResponse dummy = new TaxPaidResponse(List.of(), 1000f, 0.10f);
+        doReturn(dummy).when(spySvc).calculateTaxBreakdown(any(TaxInput.class));
+
+        List<TaxInput> inputs = List.of(
+                new TaxInput(2021, FilingStatus.S, "50000"),
+                new TaxInput(2021, FilingStatus.MFJ, "80000")
+        );
+        List<TaxPaidResponse> results = spySvc.simulateBulk(inputs);
+
+        assertEquals(2, results.size());
+        assertSame(dummy, results.get(0));
+        assertSame(dummy, results.get(1));
+    }
 
 }
