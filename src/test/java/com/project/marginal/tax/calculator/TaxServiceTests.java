@@ -204,9 +204,9 @@ public class TaxServiceTests {
                         tr
                 ));
 
-        TaxPaidResponse resp = service.calculateTaxBreakdown(new TaxInput(2021, FilingStatus.S, "0"));
-        assertEquals("No Income Tax", resp.getAvgRate());
-        assertTrue(resp.getTotalTaxPaid().contains("0"));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.calculateTaxBreakdown(new TaxInput(2021, FilingStatus.S, "0")));
+        assertTrue(ex.getMessage().toLowerCase().contains("income"));
     }
 
     // 5) Decimal income string
@@ -233,10 +233,9 @@ public class TaxServiceTests {
 
     // 6) Malformed income => NumberFormatException
     @Test
-    void calculateTaxBreakdown_malformedIncome_throwsNumberFormat() {
-        TaxInput input = new TaxInput(2021, FilingStatus.S, "12,345");
+    void taxInput_malformedIncome_throwsNumberFormat() {
         assertThrows(NumberFormatException.class,
-                () -> service.calculateTaxBreakdown(input));
+                () -> new TaxInput(2021, FilingStatus.S, "12,345"));
     }
 
 }

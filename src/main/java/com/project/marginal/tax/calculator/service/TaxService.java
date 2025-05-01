@@ -135,6 +135,11 @@ public class TaxService {
         var taxPaidInfos = new ArrayList<TaxPaidInfo>();
         float income = taxInput.getIncome();
 
+        // check if tax rates are empty
+        if (taxRates.isEmpty()) {
+            throw new IllegalArgumentException("No tax rates found for the given year and status");
+        }
+
         // Iterate through the tax rates and calculate the tax paid for each bracket and create TaxPaidInfo objects
         for (int i = 0; i < taxRates.size(); i++) {
             TaxRate taxRate = taxRates.get(i);
@@ -163,6 +168,10 @@ public class TaxService {
         // Check if the year is valid and the rate is not 0
         if (isNotValidYear(taxInput.getYear())) {
             throw new IllegalArgumentException("Invalid year: " + taxInput.getYear());
+        }
+
+        if (taxInput.getIncome() <= 0) {
+            throw new IllegalArgumentException("Income must be greater than 0");
         }
 
         List<TaxPaidInfo> taxPaidInfos = getTaxPaidInfo(taxInput);
