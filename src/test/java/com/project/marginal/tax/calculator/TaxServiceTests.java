@@ -159,4 +159,84 @@ public class TaxServiceTests {
         assertSame(dummy, results.get(1));
     }
 
+    // 1) Year too low
+    @Test
+    public void calculateTaxBreakdown_yearBelowData_throws() {
+        TaxInput input = new TaxInput(1800, FilingStatus.S, "50000");
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.calculateTaxBreakdown(input));
+        assertTrue(ex.getMessage().contains("Invalid year"));
+    }
+
+    // 2) Year too high
+    @Test
+    public void calculateTaxBreakdown_yearAboveData_throws() {
+        TaxInput input = new TaxInput(3000, FilingStatus.S, "50000");
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.calculateTaxBreakdown(input));
+        assertTrue(ex.getMessage().contains("Invalid year"));
+    }
+
+    // 3) Negative income
+    @Test
+    void calculateTaxBreakdown_negativeIncome_throws() {
+        TaxInput input = new TaxInput(2021, FilingStatus.S, "-1000");
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.calculateTaxBreakdown(input));
+        assertTrue(ex.getMessage().toLowerCase().contains("income"));
+    }
+
+    // 4) Zero income => no tax
+    @Test
+    void calculateTaxBreakdown_zeroIncome_returnsNoTax() {
+        // stub repository so it doesn't blow up
+
+        TaxRate tr = new TaxRate();
+        tr.setYear(2021);
+        tr.setStatus(FilingStatus.S);
+        tr.setRangeStart(BigDecimal.ZERO);
+        tr.setRangeEnd(BigDecimal.ZERO);
+        tr.setRate(0.0f);
+        tr.setNote("");
+
+        when(repo.findByYearAndStatusAndRangeStartLessThan(eq(2021), eq(FilingStatus.S), any()))
+                .thenReturn(List.of(
+                        tr
+                ));
+
+        TaxPaidResponse resp = service.calculateTaxBreakdown(new TaxInput(2021, FilingStatus.S, "0"));
+        assertEquals("No Income Tax", resp.getAvgRate());
+        assertTrue(resp.getTotalTaxPaid().contains("0"));
+    }
+
+    // 5) Decimal income string
+    @Test
+    void calculateTaxBreakdown_decimalIncome_parsesCorrectly() {
+        // single 10% bracket up to 100k
+
+        TaxRate tr = new TaxRate();
+        tr.setYear(2021);
+        tr.setStatus(FilingStatus.S);
+        tr.setRangeStart(BigDecimal.ZERO);
+        tr.setRangeEnd(new BigDecimal("100000"));
+        tr.setRate(0.10f);
+        tr.setNote("");
+        when(repo.findByYearAndStatusAndRangeStartLessThan(eq(2021), eq(FilingStatus.S), any()))
+                .thenReturn(List.of(
+                        tr
+                ));
+
+        TaxPaidResponse resp = service.calculateTaxBreakdown(new TaxInput(2021, FilingStatus.S, "12345.67"));
+        // 10% of 12,345.67 ≈ 1,234.57
+        assertTrue(resp.getTotalTaxPaid().contains("1,234"));
+    }
+
+    // 6) Malformed income => NumberFormatException
+    @Test
+    void calculateTaxBreakdown_malformedIncome_throwsNumberFormat() {
+        TaxInput input = new TaxInput(2021, FilingStatus.S, "12,345");
+        assertThrows(NumberFormatException.class,
+                () -> service.calculateTaxBreakdown(input));
+    }
+
 }
