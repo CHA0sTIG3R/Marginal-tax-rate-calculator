@@ -163,22 +163,32 @@ public class TaxService {
     }
 
     // calculate tax breakdown
-    public TaxPaidResponse calculateTaxBreakdown(TaxInput taxInput) {
+    public TaxPaidResponse calculateTaxBreakdown(TaxInput taxInput) throws IllegalArgumentException {
 
-        // Check if the year is valid and the rate is not 0
-        if (isNotValidYear(taxInput.getYear())) {
-            throw new IllegalArgumentException("Invalid year: " + taxInput.getYear());
-        }
-
-        if (taxInput.getIncome() <= 0) {
-            throw new IllegalArgumentException("Income must be greater than 0");
-        }
+        validateTaxInput(taxInput);
 
         List<TaxPaidInfo> taxPaidInfos = getTaxPaidInfo(taxInput);
         float totalTaxPaid = getTotalTaxPaid(taxInput);
         float avgRate = totalTaxPaid / taxInput.getIncome();
 
         return new TaxPaidResponse(taxPaidInfos, totalTaxPaid, avgRate);
+    }
+
+    private void validateTaxInput(TaxInput taxInput) {
+        // Check if the year is valid and the rate is not 0
+        if (isNotValidYear(taxInput.getYear())) {
+            throw new IllegalArgumentException("Invalid year: " + taxInput.getYear());
+        }
+
+        // Check if the income is a valid number
+        if (taxInput.getIncome() <= 0) {
+            throw new IllegalArgumentException("Income must be greater than 0");
+        }
+
+        // validate status
+        if (taxInput.getStatus() == null) {
+            throw new IllegalArgumentException("Filing status must be provided");
+        }
     }
 
     /**
