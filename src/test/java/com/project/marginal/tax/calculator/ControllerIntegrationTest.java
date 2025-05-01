@@ -9,7 +9,6 @@ import com.project.marginal.tax.calculator.dto.YearMetric;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.service.TaxService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
