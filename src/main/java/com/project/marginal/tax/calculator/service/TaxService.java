@@ -247,8 +247,12 @@ public class TaxService {
             Integer startYear,
             Integer endYear
     ) {
-        if (isNotValidYear(startYear) || isNotValidYear(endYear)) {
+        if ((isNotValidYear(startYear) || isNotValidYear(endYear)) || (startYear > endYear)) {
             throw new IllegalArgumentException("Invalid year range: " + startYear + " - " + endYear);
+        }
+
+        if (metric == null) {
+            throw new IllegalArgumentException("Unsupported metric: " + null);
         }
 
         List<Integer> years = taxRateRepo.findByStatus(status).stream()
@@ -291,7 +295,7 @@ public class TaxService {
                     val = String.valueOf(bracketCount);
                 }
 
-            default -> throw new IllegalArgumentException("unsupported metric: " + metric);
+            default -> throw new IllegalArgumentException("Unsupported metric: " + metric);
         }
         return new YearMetric(y, metric, val);
         }).toList();
