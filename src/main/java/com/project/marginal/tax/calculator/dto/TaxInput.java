@@ -24,7 +24,19 @@ public class TaxInput {
     public TaxInput(Integer year, FilingStatus status, String income) {
         this.year = year;
         this.status = status;
-        this.income = Float.parseFloat(income);
+        this.income = parseIncome(income);
+    }
+
+    private float parseIncome(String income) {
+        if (income == null || income.isBlank()){
+            throw new IllegalArgumentException("Income must be provided");
+        }
+        String parsedIncome = income.replaceAll("[$,\\s]", "");
+        try {
+            return Float.parseFloat(parsedIncome);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid income format: " + income, e);
+        }
     }
 
     public Integer getYear() {
