@@ -1,4 +1,4 @@
-package com.project.marginal.tax.calculator;// in TaxServiceTest.java (or a new TaxInputTest.java)
+package com.project.marginal.tax.calculator;
 
 import com.project.marginal.tax.calculator.dto.TaxInput;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
