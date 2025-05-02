@@ -70,7 +70,22 @@ class TaxControllerValidationIntegrationTest {
            .andExpect(jsonPath("$.message", is("Invalid year: 1800")));
     }
 
+    @Test
+    public void breakdown_malformedNumber_returns400InvalidNumber() throws Exception {
+        // Simulate service bubbling up NumberFormatException
+        when(taxService.calculateTaxBreakdown(any(TaxInput.class)))
+                .thenThrow(new NumberFormatException("For input string: \"12,345\""));
 
+        TaxInput input = new TaxInput(2021, null, "12,345");
+        String json = mapper.writeValueAsString(input);
+
+        mvc.perform(post("/api/v1/tax/breakdown")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("Invalid Number")))
+                .andExpect(jsonPath("$.message", containsString("12,345")));
+    }
 
     @Test
     public void breakdown_decimalIncome_returns200() throws Exception {
