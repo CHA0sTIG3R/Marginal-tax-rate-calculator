@@ -7,14 +7,12 @@ import com.project.marginal.tax.calculator.dto.Metric;
 import com.project.marginal.tax.calculator.dto.TaxInput;
 import com.project.marginal.tax.calculator.dto.TaxPaidResponse;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
-import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import com.project.marginal.tax.calculator.service.TaxService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class TaxServiceEdgeCaseTest {
     private TaxService service;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         repo = Mockito.mock(TaxRateRepository.class);
         service = new TaxService(repo);
     }
