@@ -37,8 +37,6 @@ class TaxControllerEdgeCasesIntegrationTest {
     @MockitoBean
     private TaxService taxService;
 
-    private final ObjectMapper mapper = new ObjectMapper();
-
     // 1. Missing 'status' param → 400 Missing Parameter
     @Test
     public void history_missingStatusParam_returns400() throws Exception {

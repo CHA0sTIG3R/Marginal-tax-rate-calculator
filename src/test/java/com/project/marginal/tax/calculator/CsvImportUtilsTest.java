@@ -59,9 +59,11 @@ class CsvImportUtilsTest {
     @Test
     public void importFromStream_rangeEndSetCorrectly() throws Exception {
         String csv =
-            "Year,MFJ_rate,MFJ_dummy,MFJ_start,MFS_rate,MFS_dummy,MFS_start,S_rate,S_dummy,S_start,HH_rate,HH_dummy,HH_start,Note\n" +
-            "2021,10.0%,>,$0,10.0%,>,$0,10.0%,>,$0,10.0%,>,$0,Test note\n"+
-            "2021,12.0%,>,$19900,12.0%,>,$9950,12.0%,>,$9950,12.0%,>,$14200,Test note\n";
+                """
+                        Year,MFJ_rate,MFJ_dummy,MFJ_start,MFS_rate,MFS_dummy,MFS_start,S_rate,S_dummy,S_start,HH_rate,HH_dummy,HH_start,Note
+                        2021,10.0%,>,$0,10.0%,>,$0,10.0%,>,$0,10.0%,>,$0,Test note
+                        2021,12.0%,>,$19900,12.0%,>,$9950,12.0%,>,$9950,12.0%,>,$14200,Test note
+                        """;
         ByteArrayInputStream in = new ByteArrayInputStream(csv.getBytes());
 
         List<BracketEntry> entries = csvUtil.importFromStream(in);
