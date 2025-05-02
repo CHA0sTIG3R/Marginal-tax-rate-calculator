@@ -179,7 +179,7 @@ public class TaxServiceTests {
 
     // 3) Negative income
     @Test
-    void calculateTaxBreakdown_negativeIncome_throws() {
+    public void calculateTaxBreakdown_negativeIncome_throws() {
         TaxInput input = new TaxInput(2021, FilingStatus.S, "-1000");
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> service.calculateTaxBreakdown(input));
@@ -188,7 +188,7 @@ public class TaxServiceTests {
 
     // 4) Zero income => no tax
     @Test
-    void calculateTaxBreakdown_zeroIncome_returnsNoTax() {
+    public void calculateTaxBreakdown_zeroIncome_returnsNoTax() {
         // stub repository so it doesn't blow up
 
         TaxRate tr = new TaxRate();
@@ -211,7 +211,7 @@ public class TaxServiceTests {
 
     // 5) Decimal income string
     @Test
-    void calculateTaxBreakdown_decimalIncome_parsesCorrectly() {
+    public void calculateTaxBreakdown_decimalIncome_parsesCorrectly() {
         // single 10% bracket up to 100k
 
         TaxRate tr = new TaxRate();
@@ -231,11 +231,12 @@ public class TaxServiceTests {
         assertTrue(resp.getTotalTaxPaid().contains("1,234"));
     }
 
-    // 6) Malformed income => NumberFormatException
+    // 6) Malformed income => IllegalArgumentException
     @Test
-    void taxInput_malformedIncome_throwsNumberFormat() {
-        assertThrows(NumberFormatException.class,
-                () -> new TaxInput(2021, FilingStatus.S, "12,345"));
+    public void taxInput_malformedIncome_throwsNumberFormat() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> new TaxInput(2021, FilingStatus.S, "12,34a5"));
+        assertTrue(ex.getMessage().contains("Invalid income format"));
     }
 
 }
