@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaxInputTest {
+public class TaxInputTest {
 
   @Test
   public void parseIncome_withDollarAndCommas() {

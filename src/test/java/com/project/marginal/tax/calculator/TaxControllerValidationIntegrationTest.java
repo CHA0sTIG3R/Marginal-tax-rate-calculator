@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = TaxController.class)
 @Import(GlobalExceptionHandler.class)
-class TaxControllerValidationIntegrationTest {
+public class TaxControllerValidationIntegrationTest {
 
     @Autowired
     private MockMvc mvc;

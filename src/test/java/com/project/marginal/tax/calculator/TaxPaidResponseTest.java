@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaxPaidResponseTest {
+public class TaxPaidResponseTest {
 
     @Test
     public void avgRate_zero_yieldsNoIncomeTax() {

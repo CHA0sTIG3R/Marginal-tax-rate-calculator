@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = TaxController.class)
 @Import(GlobalExceptionHandler.class)
-class TaxControllerEdgeCasesIntegrationTest {
+public class TaxControllerEdgeCasesIntegrationTest {
 
     @Autowired
     private MockMvc mvc;
