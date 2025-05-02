@@ -28,4 +28,10 @@ class TaxInputTest {
     );
     assertTrue(ex.getMessage().contains("Invalid income format"));
   }
+
+  @Test
+  public void constructor_nullIncome_throwsIllegalArgument() {
+    assertThrows(IllegalArgumentException.class,
+            () -> new TaxInput(2021, FilingStatus.S, null));
+  }
 }
