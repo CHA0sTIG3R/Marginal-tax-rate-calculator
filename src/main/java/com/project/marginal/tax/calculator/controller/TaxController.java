@@ -51,12 +51,6 @@ public class TaxController {
         return service.calculateTaxBreakdown(taxInput);
     }
 
-    @GetMapping("/notes")
-    public TaxNoteResponse getNote(@RequestParam String year) throws IllegalArgumentException {
-        String note = service.getNoteByYear(Integer.parseInt(year));
-        return new TaxNoteResponse(Integer.parseInt(year), note);
-    }
-
     @GetMapping("/summary")
     public TaxSummaryResponse getSummary(@RequestParam int year, @RequestParam FilingStatus status) throws IllegalArgumentException {
         return service.getSummary(year, status);

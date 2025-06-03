@@ -39,7 +39,6 @@ public class TaxDataImportServiceTests {
         entry.setRangeStart(new BigDecimal("0"));
         entry.setRangeEnd(new BigDecimal("50000"));
         entry.setRate(0.10f);
-        entry.setNote("Test note");
 
         List<BracketEntry> entries = List.of(entry);
 

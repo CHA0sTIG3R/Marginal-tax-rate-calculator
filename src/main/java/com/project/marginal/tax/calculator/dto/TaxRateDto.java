@@ -22,15 +22,13 @@ public class TaxRateDto {
     private final String rangeStart;
     private final String rangeEnd;
     private final String rate;
-    private final String note;
 
-    public TaxRateDto(int year, FilingStatus filingStatus, float rangeStart, float rangeEnd, float rate, String note) {
+    public TaxRateDto(int year, FilingStatus filingStatus, float rangeStart, float rangeEnd, float rate) {
         this.year = year;
         this.filingStatus = filingStatus;
         this.rangeStart = dollarFormat(rangeStart);
         this.rangeEnd = rangeEnd == 0 ? "No Upper Limit" : dollarFormat(rangeEnd);
         this.rate = rate == 0 ? "No Income Tax" : percentFormat(rate);
-        this.note = note;
     }
 
     public Integer getYear() {
@@ -53,7 +51,4 @@ public class TaxRateDto {
         return rate;
     }
 
-    public String getNote() {
-        return note;
-    }
 }

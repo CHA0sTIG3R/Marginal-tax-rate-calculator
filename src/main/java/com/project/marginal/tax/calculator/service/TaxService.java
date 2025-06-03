@@ -59,8 +59,7 @@ public class TaxService {
                         taxRate.getStatus(),
                         taxRate.getRangeStart().floatValue(),
                         taxRate.getRangeEnd() != null ? taxRate.getRangeEnd().floatValue(): 0,
-                        taxRate.getRate(),
-                        taxRate.getNote()
+                        taxRate.getRate()
                 ))
                 .toList();
     }
@@ -73,8 +72,7 @@ public class TaxService {
                         taxRate.getStatus(),
                         taxRate.getRangeStart().floatValue(),
                         taxRate.getRangeEnd() != null ? taxRate.getRangeEnd().floatValue(): 0,
-                        taxRate.getRate(),
-                        taxRate.getNote()
+                        taxRate.getRate()
                 ))
                 .toList();
     }
@@ -191,23 +189,6 @@ public class TaxService {
         }
     }
 
-    /**
-     * @return the legislative note for the given year, or a default message if none.
-     */
-    public String getNoteByYear(int year) {
-
-        // Check if the year is valid
-        if (isNotValidYear(year)) {
-            throw new IllegalArgumentException("Invalid year: " + year);
-        }
-
-        return taxRateRepo.findNoteByYear(year).stream()
-                .map(TaxRate::getNote)
-                .filter(n -> !n.isBlank())
-                .findFirst()
-                .orElse("No legislative note available for year " + year);
-    }
-
 
     public TaxSummaryResponse getSummary(int year, FilingStatus status) throws IllegalArgumentException {
 
@@ -236,9 +217,8 @@ public class TaxService {
                 .orElse(0.0);
 
         String averageRate = avgRateRaw == 0.0 ? "No Income Tax" : percentFormat(avgRateRaw);
-        String note = getNoteByYear(year);
 
-        return new TaxSummaryResponse(year, status, bracketCount, minThreshold, maxThreshold, averageRate, note);
+        return new TaxSummaryResponse(year, status, bracketCount, minThreshold, maxThreshold, averageRate);
     }
 
     public List<YearMetric> getHistory(

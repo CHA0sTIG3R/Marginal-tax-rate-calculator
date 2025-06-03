@@ -50,7 +50,6 @@ public class TaxServiceTests {
         tr.setRangeStart(new BigDecimal("0"));
         tr.setRangeEnd(new BigDecimal("9876"));
         tr.setRate(0.10f);
-        tr.setNote("Test note");
         tr.setStatus(FilingStatus.S);
         when(repo.findByYear(2021)).thenReturn(List.of(tr));
 
@@ -79,7 +78,6 @@ public class TaxServiceTests {
         tr.setRangeStart(new BigDecimal("0"));
         tr.setRangeEnd(new BigDecimal("50000"));
         tr.setRate(0.10f);
-        tr.setNote("Test bracket");
 
         // When getting tax rates less than income
         when(repo.findByYearAndStatusAndRangeStartLessThan(eq(2021), eq(FilingStatus.S), any())).thenReturn(List.of(tr));
@@ -98,21 +96,18 @@ public class TaxServiceTests {
         r2020a.setRangeStart(BigDecimal.ZERO);
         r2020a.setRangeEnd(new BigDecimal("50000"));
         r2020a.setRate(0.10f);
-        r2020a.setNote("Test note");
         TaxRate r2020b = new TaxRate();
         r2020b.setYear(2020);
         r2020b.setStatus(FilingStatus.S);
         r2020b.setRangeStart(new BigDecimal("50000"));
         r2020b.setRangeEnd(new BigDecimal("100000"));
         r2020b.setRate(0.15f);
-        r2020b.setNote("");
         TaxRate r2021  = new TaxRate();
         r2021.setYear(2021);
         r2021.setStatus(FilingStatus.S);
         r2021.setRangeStart(BigDecimal.ZERO);
         r2021.setRangeEnd(new BigDecimal("75000"));
         r2021.setRate(0.20f);
-        r2021.setNote("");
 
         // findByStatus returns all three, which yields years [2020,2021]
         when(repo.findByStatus(FilingStatus.S)).thenReturn(List.of(r2020a, r2020b, r2021));
@@ -197,8 +192,6 @@ public class TaxServiceTests {
         tr.setRangeStart(BigDecimal.ZERO);
         tr.setRangeEnd(BigDecimal.ZERO);
         tr.setRate(0.0f);
-        tr.setNote("");
-
         when(repo.findByYearAndStatusAndRangeStartLessThan(eq(2021), eq(FilingStatus.S), any()))
                 .thenReturn(List.of(
                         tr
@@ -220,7 +213,6 @@ public class TaxServiceTests {
         tr.setRangeStart(BigDecimal.ZERO);
         tr.setRangeEnd(new BigDecimal("100000"));
         tr.setRate(0.10f);
-        tr.setNote("");
         when(repo.findByYearAndStatusAndRangeStartLessThan(eq(2021), eq(FilingStatus.S), any()))
                 .thenReturn(List.of(
                         tr

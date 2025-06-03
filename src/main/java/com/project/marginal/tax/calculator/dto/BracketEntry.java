@@ -27,7 +27,6 @@ public class BracketEntry {
     private Float rate;
     private BigDecimal rangeStart;
     private BigDecimal rangeEnd;
-    private String note;
 
     public Integer getYear() {
         return year;
@@ -69,14 +68,6 @@ public class BracketEntry {
         this.rangeEnd = rangeEnd;
     }
 
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
     @Override
     public String toString() {
         return "BracketEntry{" +
@@ -85,7 +76,6 @@ public class BracketEntry {
                 ", rate=" + rate +
                 ", rangeStart=" + rangeStart +
                 ", rangeEnd=" + rangeEnd +
-                ", note='" + note + '\'' +
                 '}';
     }
 }

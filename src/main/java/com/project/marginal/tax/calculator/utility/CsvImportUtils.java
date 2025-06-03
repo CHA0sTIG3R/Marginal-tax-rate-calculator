@@ -130,7 +130,6 @@ public class CsvImportUtils {
         bracketEntry.setStatus(status);
         bracketEntry.setRate(rate);
         bracketEntry.setRangeStart(start);
-        bracketEntry.setNote(note);
         rates.add(bracketEntry);
     }
 

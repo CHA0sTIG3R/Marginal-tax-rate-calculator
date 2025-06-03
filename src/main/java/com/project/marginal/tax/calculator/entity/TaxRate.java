@@ -36,9 +36,6 @@ public class TaxRate {
     private BigDecimal rangeStart;
     private BigDecimal rangeEnd;
 
-    @Column(columnDefinition = "Text")
-    private String note;
-
     public Long getId() {
         return id;
     }
@@ -87,23 +84,15 @@ public class TaxRate {
         this.rangeEnd = rangeEnd;
     }
 
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
     @Override
     public String toString() {
         return "TaxRate{" +
-                "year=" + year +
-                ", status='" + status + '\'' +
+                "id=" + id +
+                ", year=" + year +
+                ", status=" + status +
                 ", rate=" + rate +
                 ", rangeStart=" + rangeStart +
                 ", rangeEnd=" + rangeEnd +
-                ", note='" + note + '\'' +
                 '}';
     }
 }

@@ -15,5 +15,5 @@ import com.project.marginal.tax.calculator.entity.FilingStatus;
 import java.math.BigDecimal;
 
 public record TaxSummaryResponse(Integer year, FilingStatus status, int bracketCount, BigDecimal minThreshold,
-                                 BigDecimal maxThreshold, String averageRate, String note) {
+                                 BigDecimal maxThreshold, String averageRate) {
 }

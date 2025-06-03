@@ -42,7 +42,6 @@ public class TaxDataImportService {
             tr.setRangeStart(entry.getRangeStart());
             tr.setRangeEnd(entry.getRangeEnd());
             tr.setRate(entry.getRate());
-            tr.setNote(entry.getNote());
             repo.save(tr);
         }
     }

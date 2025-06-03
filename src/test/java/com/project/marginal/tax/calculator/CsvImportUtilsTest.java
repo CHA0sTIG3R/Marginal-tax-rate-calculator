@@ -51,7 +51,6 @@ public class CsvImportUtilsTest {
             .findFirst()
             .orElseThrow();
         assertEquals(2021, be.getYear());
-        assertEquals("Test note", be.getNote());
         assertEquals(BigDecimal.ZERO, be.getRangeStart());
     }
 

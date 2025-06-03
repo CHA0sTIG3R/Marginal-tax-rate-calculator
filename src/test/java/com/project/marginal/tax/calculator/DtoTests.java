@@ -18,16 +18,14 @@ public class DtoTests {
         float rangeStart = 50000f;
         float rangeEnd = 100000f;
         float rate = 0.24f;
-        String note = "Test note";
 
-        TaxRateDto dto = new TaxRateDto(year, status, rangeStart, rangeEnd, rate, note);
+        TaxRateDto dto = new TaxRateDto(year, status, rangeStart, rangeEnd, rate);
 
-        // Assert that the formatted strings are as expected – these depend on the formatting in NumberFormatUtils
-        // For example, if rangeStart = 50000 is formatted as "$50,000.00" and rate as "24%"
+        // Assert that the formatted strings are as expected – these depend on the formatting in NumberFormatUtils,
+        // For example, if rangeStart = 50,000 is formatted as "$50,000.00" and rate as "24%"
         assertTrue(dto.getRangeStart().contains("50"));
         assertTrue(dto.getRangeEnd().contains("100"));
         assertTrue(dto.getRate().contains("%"));
-        assertEquals(note, dto.getNote());
     }
 
     @Test
@@ -40,15 +38,8 @@ public class DtoTests {
         );
         assertNotNull(response.getBrackets());
         assertTrue(response.getTotalTaxPaid().contains("$"));
-        // If average rate is 24% then the percentFormat will return a string containing "%"
+        // If the average rate is 24%, then the percentFormat will return a string containing "%"
         assertTrue(response.getAvgRate().contains("%") || response.getAvgRate().equals("No Income Tax"));
-    }
-
-    @Test
-    public void testTaxNoteResponse() {
-        TaxNoteResponse response = new TaxNoteResponse(2021, "Test legislative note");
-        assertEquals(2021, response.year());
-        assertEquals("Test legislative note", response.note());
     }
 
     @Test
@@ -59,8 +50,7 @@ public class DtoTests {
                 4,
                 new BigDecimal("0"),
                 new BigDecimal("100000"),
-                "24%",
-                "Summary Note"
+                "24%"
         );
         assertEquals(2021, summary.year());
         assertEquals(FilingStatus.MFJ, summary.status());
