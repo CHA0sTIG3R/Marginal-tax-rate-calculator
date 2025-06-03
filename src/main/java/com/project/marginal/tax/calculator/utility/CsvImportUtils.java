@@ -56,16 +56,16 @@ public class CsvImportUtils {
 
 
                 if (!line[1].isEmpty()) {
-                    insertTaxRate(year, FilingStatus.MFJ, line[1], line[3], line[13]);
+                    insertTaxRate(year, FilingStatus.MFJ, line[1], line[3]);
                 }
                 if (!(line[4].isEmpty() && line[1].isEmpty())) {
-                    insertTaxRate(year, FilingStatus.MFS, line[4], line[6], line[13]);
+                    insertTaxRate(year, FilingStatus.MFS, line[4], line[6]);
                 }
                 if (!(line[7].isEmpty() && line[1].isEmpty())) {
-                    insertTaxRate(year, FilingStatus.S, line[7], line[9], line[13]);
+                    insertTaxRate(year, FilingStatus.S, line[7], line[9]);
                 }
                 if (!(line[10].isEmpty() && line[1].isEmpty())) {
-                    insertTaxRate(year, FilingStatus.HH, line[10], line[12], line[13]);
+                    insertTaxRate(year, FilingStatus.HH, line[10], line[12]);
                 }
             }
         }
@@ -115,9 +115,8 @@ public class CsvImportUtils {
      * @param status The filing status (e.g., "Married Filing Jointly").
      * @param rawRate The raw tax rate as a string (e.g., "24%").
      * @param rawStart The raw starting range as a string (e.g., "$50,000").
-     * @param note A note associated with the tax rate.
      */
-    private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart, String note) {
+    private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart) {
 
         boolean isNoIncomeTax = rawRate.isEmpty() || rawRate.equalsIgnoreCase("No income tax");
 
