@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -27,25 +29,34 @@ public class TaxDataBootstrapper implements CommandLineRunner {
 
     private final TaxDataImportService importer;
     private final TaxRateRepository repo;
+    private final S3Client s3Client;
 
     @Value("${tax.import-on-startup:false}")
     private boolean importOnStartup;
 
-    @Value("${tax.data-url}")
-    private String dataUrl;
+    @Value("${tax.s3-bucket}")
+    private String s3Bucket;
 
-    public TaxDataBootstrapper(TaxDataImportService importer, TaxRateRepository repo) {
+    @Value("${tax.s3-key}")
+    private String s3Key;
+
+    public TaxDataBootstrapper(TaxDataImportService importer, TaxRateRepository repo, S3Client s3Client) {
         this.importer = importer;
         this.repo = repo;
+        this.s3Client = s3Client;
     }
 
     @Override
     public void run(String... args) {
         if (!importOnStartup || repo.count() > 0) return;
 
-        System.out.println("Fetching data from " + dataUrl);
+        System.out.printf("📦 Fetching tax data from s3://%s/%s%n", s3Bucket, s3Key);
 
-        try (InputStream in = new URL(dataUrl).openStream()) {
+        try (InputStream in = s3Client.getObject(
+                GetObjectRequest.builder()
+                        .bucket(s3Bucket)
+                        .key(s3Key)
+                        .build())) {
             importer.importData(in);
             System.out.println("✔ Tax rates imported from remote CSV.");
         }
