@@ -14,6 +14,7 @@ package com.project.marginal.tax.calculator.controller;
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.service.TaxService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +23,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/tax")
+@RequiredArgsConstructor
 public class TaxController {
 
     private final TaxService service;
-
-    public TaxController(TaxService service) {
-        this.service = service;
-    }
 
     @GetMapping("/years")
     public List<Integer> getYears() {

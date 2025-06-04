@@ -13,6 +13,7 @@ package com.project.marginal.tax.calculator.bootstrap;
 
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import com.project.marginal.tax.calculator.service.TaxDataImportService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,7 @@ import java.io.InputStream;
 
 @Component
 @Profile("data-import")
+@RequiredArgsConstructor
 public class TaxDataBootstrapper implements CommandLineRunner {
 
     private final TaxDataImportService importer;
@@ -38,12 +40,6 @@ public class TaxDataBootstrapper implements CommandLineRunner {
 
     @Value("${tax.s3-key}")
     private String s3Key;
-
-    public TaxDataBootstrapper(TaxDataImportService importer, TaxRateRepository repo, S3Client s3Client) {
-        this.importer = importer;
-        this.repo = repo;
-        this.s3Client = s3Client;
-    }
 
     @Override
     public void run(String... args) {

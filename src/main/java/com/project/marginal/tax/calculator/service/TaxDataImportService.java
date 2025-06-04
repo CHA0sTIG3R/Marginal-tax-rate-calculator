@@ -16,6 +16,7 @@ import com.project.marginal.tax.calculator.dto.BracketEntry;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import com.project.marginal.tax.calculator.utility.CsvImportUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,15 +24,11 @@ import java.io.InputStream;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TaxDataImportService {
 
     private final CsvImportUtils csvUtil;
     private final TaxRateRepository repo;
-
-    public TaxDataImportService(CsvImportUtils csvUtil, TaxRateRepository repo) {
-        this.csvUtil = csvUtil;
-        this.repo = repo;
-    }
 
     public void importData(InputStream in) throws CsvValidationException, IOException {
         List<BracketEntry> entries = csvUtil.importFromStream(in);

@@ -15,6 +15,7 @@ import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,16 +24,13 @@ import java.util.*;
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
 @Service
+@RequiredArgsConstructor
 public class TaxService {
 
     int MIN_YEAR = 1862;
     int MAX_YEAR = 2021;
 
     private final TaxRateRepository taxRateRepo;
-
-    public TaxService(TaxRateRepository taxRateRepo) {
-        this.taxRateRepo = taxRateRepo;
-    }
 
     // check if year in taxInput is between 1862 and 2021
     private boolean isNotValidYear(int year) {
