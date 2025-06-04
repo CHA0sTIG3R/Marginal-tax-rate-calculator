@@ -21,7 +21,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.InputStream;
-import java.net.URL;
 
 @Component
 @Profile("data-import")
