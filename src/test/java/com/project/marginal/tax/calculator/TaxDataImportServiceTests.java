@@ -6,7 +6,6 @@ import com.project.marginal.tax.calculator.dto.BracketEntry;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
-import com.project.marginal.tax.calculator.service.TaxDataImportService;
 import com.project.marginal.tax.calculator.utility.CsvImportUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,13 +21,11 @@ public class TaxDataImportServiceTests {
 
     private CsvImportUtils csvImportUtils;
     private TaxRateRepository repo;
-    private TaxDataImportService importService;
 
     @BeforeEach
     public void setUp() {
         csvImportUtils = Mockito.mock(CsvImportUtils.class);
         repo = Mockito.mock(TaxRateRepository.class);
-        importService = new TaxDataImportService(csvImportUtils, repo);
     }
 
     @Test
