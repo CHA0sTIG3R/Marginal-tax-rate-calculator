@@ -15,7 +15,6 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.dto.BracketEntry;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
-import com.project.marginal.tax.calculator.dto.YearStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -51,60 +50,24 @@ public class CsvImportUtils {
                     continue;
                 }
 
-                String yearStr = (Objects.equals(line[0], "1940(A)"))? parseYear1940Entry(line[0]) : line[0];
-                Integer year = Integer.valueOf(yearStr);
-
+                Integer year = Integer.valueOf(line[0]);
 
                 if (!line[1].isEmpty()) {
-                    insertTaxRate(year, FilingStatus.MFJ, line[1], line[3]);
+                    insertTaxRate(year, FilingStatus.MFJ, line[1], line[2], line[3]);
                 }
                 if (!(line[4].isEmpty() && line[1].isEmpty())) {
-                    insertTaxRate(year, FilingStatus.MFS, line[4], line[6]);
+                    insertTaxRate(year, FilingStatus.MFS, line[4], line[5], line[6]);
                 }
                 if (!(line[7].isEmpty() && line[1].isEmpty())) {
-                    insertTaxRate(year, FilingStatus.S, line[7], line[9]);
+                    insertTaxRate(year, FilingStatus.S, line[7], line[8], line[9]);
                 }
                 if (!(line[10].isEmpty() && line[1].isEmpty())) {
-                    insertTaxRate(year, FilingStatus.HH, line[10], line[12]);
+                    insertTaxRate(year, FilingStatus.HH, line[10], line[11], line[12]);
                 }
             }
         }
-
-        populateRangeEnd();
 
         return rates;
-    }
-
-    /**
-     * This method is used to populate the range end for each tax bracket.
-     * It groups the tax brackets by year and status, sorts them by range start,
-     * and sets the range end for each bracket based on the next bracket's start.
-     */
-    private void populateRangeEnd() {
-        Map<YearStatus, List<BracketEntry>> map = new HashMap<>();
-
-        for (BracketEntry be : rates){
-            YearStatus key = new YearStatus(be.getYear(), be.getStatus());
-            map.putIfAbsent(key, new ArrayList<>());
-            map.get(key).add(be);
-        }
-
-        for (Map.Entry<YearStatus, List<BracketEntry>> entry : map.entrySet()){
-            List<BracketEntry> list = entry.getValue();
-
-            list.sort(Comparator.comparing(BracketEntry::getRangeStart));
-
-            for (int i = 0; i < list.size(); i++){
-                BracketEntry be = list.get(i);
-                if (be.getRate() == 0f) {
-                    be.setRangeEnd(be.getRangeStart());
-                } else if (i < list.size() - 1){
-                    be.setRangeEnd(list.get(i+1).getRangeStart());
-                } else {
-                    be.setRangeEnd(null);
-                }
-            }
-        }
     }
 
     /**
@@ -116,19 +79,21 @@ public class CsvImportUtils {
      * @param rawRate The raw tax rate as a string (e.g., "24%").
      * @param rawStart The raw starting range as a string (e.g., "$50,000").
      */
-    private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart) {
+    private void insertTaxRate(Integer year, FilingStatus status, String rawRate, String rawStart, String rawEnd) {
 
         boolean isNoIncomeTax = rawRate.isEmpty() || rawRate.equalsIgnoreCase("No income tax");
 
         Float rate = isNoIncomeTax ? 0f : Float.parseFloat(rawRate.replace("%", "").trim()) / 100;
 
         BigDecimal start = isNoIncomeTax ? BigDecimal.ZERO : parseDollarValue(rawStart);
+        BigDecimal end = isNoIncomeTax ? null : parseDollarValue(rawEnd);
 
         BracketEntry bracketEntry = new BracketEntry();
         bracketEntry.setYear(year);
         bracketEntry.setStatus(status);
         bracketEntry.setRate(rate);
         bracketEntry.setRangeStart(start);
+        bracketEntry.setRangeEnd(end);
         rates.add(bracketEntry);
     }
 
@@ -147,14 +112,4 @@ public class CsvImportUtils {
         return new BigDecimal(cleaned.trim());
     }
 
-    /**
-     * This method is used to parse the year 1940 entry in the CSV file.
-     * The entry is in the format "1940(A)" and we need to remove the "(A)" part.
-     *
-     * @param year The year string to be parsed.
-     * @return The parsed year string without the "(A)" part.
-     */
-    private String parseYear1940Entry(String year){
-        return year.replace("(A)", "");
-    }
 }
