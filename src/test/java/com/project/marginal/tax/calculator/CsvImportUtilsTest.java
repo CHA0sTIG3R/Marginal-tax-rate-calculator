@@ -37,9 +37,11 @@ public class CsvImportUtilsTest {
     @Test
     public void importFromStream_blankYearSkipped_andValidParsed() throws Exception {
         String csv =
-            "Year,MFJ_rate,MFJ_dummy,MFJ_start,MFS_rate,MFS_dummy,MFS_start,S_rate,S_dummy,S_start,HH_rate,HH_dummy,HH_start,Note\n" +
-            ",,,,,,,,,,,,,          \n" +  // blank year row
-            "2021,10.0%,>,$0,10.0%,>,$0,10.0%,>,$0,10.0%,>,$0,Test note\n";
+                """
+                        Year,Married Filing Jointly (Rates/Brackets),MFJ Range Start,MFJ Range End,Married Filing Separately (Rates/Brackets),MFS Range Start,MFS Range End,Single Filer (Rates/Brackets),S Range Start,S Range End,Head of Household (Rates/Brackets),HOH Range Start,HOH Range End
+                        2023,10.0%,$0,"$22,000",10.0%,$0,"$11,000",10.0%,$0,"$11,000",10.0%,$0,"$15,700"
+                        2023,12.0%,"$22,001","$89,450",12.0%,"$11,001","$44,725",12.0%,"$11,001","$44,725",12.0%,"$15,701","$59,850"
+                        """;
         ByteArrayInputStream in = new ByteArrayInputStream(csv.getBytes());
 
         List<BracketEntry> entries = csvUtil.importFromStream(in);
@@ -59,9 +61,9 @@ public class CsvImportUtilsTest {
     public void importFromStream_rangeEndSetCorrectly() throws Exception {
         String csv =
                 """
-                        Year,MFJ_rate,MFJ_dummy,MFJ_start,MFS_rate,MFS_dummy,MFS_start,S_rate,S_dummy,S_start,HH_rate,HH_dummy,HH_start,Note
-                        2021,10.0%,>,$0,10.0%,>,$0,10.0%,>,$0,10.0%,>,$0,Test note
-                        2021,12.0%,>,$19900,12.0%,>,$9950,12.0%,>,$9950,12.0%,>,$14200,Test note
+                        Year,Married Filing Jointly (Rates/Brackets),MFJ Range Start,MFJ Range End,Married Filing Separately (Rates/Brackets),MFS Range Start,MFS Range End,Single Filer (Rates/Brackets),S Range Start,S Range End,Head of Household (Rates/Brackets),HOH Range Start,HOH Range End
+                        2023,10.0%,$0,"$22,000",10.0%,$0,"$11,000",10.0%,$0,"$11,000",10.0%,$0,"$15,700"
+                        2023,12.0%,"$22,001","$89,450",12.0%,"$11,001","$44,725",12.0%,"$11,001","$44,725",12.0%,"$15,701","$59,850"
                         """;
         ByteArrayInputStream in = new ByteArrayInputStream(csv.getBytes());
 

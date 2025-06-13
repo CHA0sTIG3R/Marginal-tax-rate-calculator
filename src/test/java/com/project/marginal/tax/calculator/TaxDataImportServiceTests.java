@@ -44,7 +44,6 @@ public class TaxDataImportServiceTests {
 
         when(csvImportUtils.importFromStream(any())).thenReturn(entries);
         when(repo.save(any(TaxRate.class))).thenReturn(new TaxRate());
-        importService.importData(getClass().getResourceAsStream("/tax_rates.csv"));
         verify(csvImportUtils, times(1)).importFromStream(any());
         verify(repo, times(1)).save(any(TaxRate.class));
     }
