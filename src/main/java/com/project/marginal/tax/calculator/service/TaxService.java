@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Year;
 import java.util.*;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
@@ -28,7 +29,7 @@ import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.perc
 public class TaxService {
 
     int MIN_YEAR = 1862;
-    int MAX_YEAR = 2021;
+    int MAX_YEAR = Year.now().getValue() - 1;
 
     private final TaxRateRepository taxRateRepo;
 
