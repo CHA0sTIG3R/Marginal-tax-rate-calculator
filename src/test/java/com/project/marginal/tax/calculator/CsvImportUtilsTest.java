@@ -2,14 +2,13 @@ package com.project.marginal.tax.calculator;
 
 import com.project.marginal.tax.calculator.dto.BracketEntry;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
-import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.utility.CsvImportUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,7 +82,7 @@ public class CsvImportUtilsTest {
         // Spot-check S brackets: rangeStart 0 & 3000, rangeEnd 3000 & 4000
         List<BracketEntry> sBrackets = entries.stream()
                 .filter(e -> e.getStatus() == FilingStatus.S)
-                .sorted((a,b) -> a.getRangeStart().compareTo(b.getRangeStart()))
+                .sorted(Comparator.comparing(BracketEntry::getRangeStart))
                 .toList();
         assertEquals(BigDecimal.ZERO,   sBrackets.get(0).getRangeStart());
         assertEquals(new BigDecimal("3000"), sBrackets.get(0).getRangeEnd());
