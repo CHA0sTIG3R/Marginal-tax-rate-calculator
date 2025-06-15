@@ -1,8 +1,7 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.utility;
 
 import com.project.marginal.tax.calculator.dto.BracketEntry;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
-import com.project.marginal.tax.calculator.utility.CsvImportUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

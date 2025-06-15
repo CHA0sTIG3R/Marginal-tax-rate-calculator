@@ -1,6 +1,5 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.utility;
 
-import com.project.marginal.tax.calculator.utility.NumberFormatUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

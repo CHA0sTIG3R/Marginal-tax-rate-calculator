@@ -1,8 +1,7 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.repository;
 
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
-import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

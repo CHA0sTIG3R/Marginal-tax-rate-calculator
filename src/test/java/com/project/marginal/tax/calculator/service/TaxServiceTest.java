@@ -1,10 +1,9 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.service;
 
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
-import com.project.marginal.tax.calculator.service.TaxService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;

@@ -1,4 +1,4 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.service;
 
 
 import com.opencsv.exceptions.CsvValidationException;

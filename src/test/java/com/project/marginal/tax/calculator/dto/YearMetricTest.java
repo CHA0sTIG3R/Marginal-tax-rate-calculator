@@ -1,7 +1,5 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.dto;
 
-import com.project.marginal.tax.calculator.dto.Metric;
-import com.project.marginal.tax.calculator.dto.YearMetric;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

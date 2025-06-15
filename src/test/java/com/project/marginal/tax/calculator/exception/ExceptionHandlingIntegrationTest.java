@@ -1,9 +1,8 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.marginal.tax.calculator.controller.TaxController;
 import com.project.marginal.tax.calculator.dto.TaxInput;
-import com.project.marginal.tax.calculator.exception.GlobalExceptionHandler;
 import com.project.marginal.tax.calculator.service.TaxService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

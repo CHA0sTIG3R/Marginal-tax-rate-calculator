@@ -1,6 +1,5 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.exception;
 
-import com.project.marginal.tax.calculator.exception.GlobalExceptionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

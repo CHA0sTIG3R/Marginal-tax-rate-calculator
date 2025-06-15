@@ -1,7 +1,5 @@
-package com.project.marginal.tax.calculator;
+package com.project.marginal.tax.calculator.dto;
 
-import com.project.marginal.tax.calculator.dto.TaxPaidInfo;
-import com.project.marginal.tax.calculator.dto.TaxPaidResponse;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.utility.NumberFormatUtils;
 import org.junit.jupiter.api.Test;
