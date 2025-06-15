@@ -33,4 +33,6 @@ build/
 .vscode/
 
 ### Application
-application.properties
+/src/main/resources/application.properties
+/src/main/resources/static/Historical Income Tax Rates and Brackets, 1862-2021.csv
+/src/main/resources/static/test.csv
