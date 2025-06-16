@@ -43,7 +43,7 @@ public class DtoTests {
 
     @Test
     public void testTaxSummaryResponse() {
-        TaxSummaryResponse summary = new TaxSummaryResponse(
+        TaxSummaryResponse summary = TaxSummaryResponse.normal(
                 2021,
                 FilingStatus.MFJ,
                 4,
