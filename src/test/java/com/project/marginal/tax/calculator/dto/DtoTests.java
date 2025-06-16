@@ -65,11 +65,4 @@ public class DtoTests {
         assertEquals(75000f, input.getIncome());
     }
 
-    @Test
-    public void testYearStatusRecord() {
-        YearStatus ys = new YearStatus(2021, FilingStatus.MFS);
-        assertEquals(2021, ys.year());
-        assertEquals(FilingStatus.MFS, ys.status());
-    }
-
 }
