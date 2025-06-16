@@ -13,7 +13,9 @@ package com.project.marginal.tax.calculator.service;
 
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.entity.NoIncomeTaxYear;
 import com.project.marginal.tax.calculator.entity.TaxRate;
+import com.project.marginal.tax.calculator.repository.NoIncomeTaxYearRepository;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Year;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
@@ -32,32 +35,39 @@ public class TaxService {
     int MAX_YEAR = Year.now().getValue() - 1;
 
     private final TaxRateRepository taxRateRepo;
+    private final NoIncomeTaxYearRepository noTaxRepo;
 
-    // check if year in taxInput is between 1862 and 2021
     private boolean isNotValidYear(int year) {
         return year < MIN_YEAR || year > MAX_YEAR;
     }
+    private boolean isNoTaxYear(int year) {
+        return noTaxRepo.existsById(year);
+    }
 
     private void validateTaxInput(TaxInput taxInput) {
-        // Check if the year is valid and the rate is not 0
         if (isNotValidYear(taxInput.getYear())) {
             throw new IllegalArgumentException("Invalid year: " + taxInput.getYear());
         }
 
-        // Check if the income is a valid number
         if (taxInput.getIncome() <= 0) {
             throw new IllegalArgumentException("Income must be greater than 0");
         }
 
-        // validate status
         if (taxInput.getStatus() == null) {
             throw new IllegalArgumentException("Filing status must be provided");
         }
     }
 
     public List<Integer> listYears() {
-        return taxRateRepo.findAll().stream()
+        List <Integer> noTaxYears = noTaxRepo.findAll().stream()
+                .map(NoIncomeTaxYear::getYear)
+                .toList();
+
+        List<Integer> bracketYears =  taxRateRepo.findAll().stream()
                 .map(TaxRate::getYear)
+                .toList();
+
+        return Stream.concat(bracketYears.stream(), noTaxYears.stream())
                 .distinct()
                 .sorted()
                 .toList();
@@ -67,7 +77,6 @@ public class TaxService {
         return FilingStatus.toMap();
     }
 
-    // get the tax rates for a year
     public List<TaxRateDto> getTaxRateByYear(int year) {
         return taxRateRepo.findByYear(year).stream()
                 .map(taxRate -> new TaxRateDto(
@@ -80,7 +89,6 @@ public class TaxService {
                 .toList();
     }
 
-    // get the tax rates by year and status
     public List<TaxRateDto> getTaxRateByYearAndStatus(int year, FilingStatus status) {
         return taxRateRepo.findByYearAndStatus(year, status).stream()
                 .map(taxRate -> new TaxRateDto(
@@ -94,9 +102,15 @@ public class TaxService {
     }
 
     public List<TaxRateDto> getRates(int year, FilingStatus status) {
-        // Check if the year is valid
         if (isNotValidYear(year)) {
             throw new IllegalArgumentException("Invalid year: " + year);
+        }
+
+        if (isNoTaxYear(year)) {
+            String msg = noTaxRepo.findById(year)
+                    .map(NoIncomeTaxYear::getMessage)
+                    .orElse("No income tax for year " + year);
+            return List.of(TaxRateDto.noIncomeTax(year, status, msg));
         }
 
         if (status == null) {
@@ -106,12 +120,10 @@ public class TaxService {
         }
     }
 
-    // get the tax rates by year, status and all ranges less than or equal to the income
     public List<TaxRate> getTaxRateByYearAndStatusAndRangeStartLessThan(int year, FilingStatus status, float income) {
         return taxRateRepo.findByYearAndStatusAndRangeStartLessThan(year, status, new BigDecimal(income));
     }
 
-    // calculate the tax for a given income
     public List<Float> calculateTax(TaxInput taxInput) {
         List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThan(
                 taxInput.getYear(),
@@ -121,7 +133,6 @@ public class TaxService {
         var taxPaidPerBracket = new ArrayList<Float>();
         float income = taxInput.getIncome();
 
-        // Iterate through the tax rates and calculate the tax paid for each bracket
         for (TaxRate taxRate : taxRates) {
             float taxPaid;
             if (income > taxRate.getRangeStart().floatValue()) {
@@ -138,7 +149,6 @@ public class TaxService {
         return taxPaidPerBracket;
     }
 
-    // get tax paid information
     public List<TaxPaidInfo> getTaxPaidInfo(TaxInput taxInput) {
         List<TaxRate> taxRates = getTaxRateByYearAndStatusAndRangeStartLessThan(
                 taxInput.getYear(),
@@ -149,12 +159,10 @@ public class TaxService {
         var taxPaidInfos = new ArrayList<TaxPaidInfo>();
         float income = taxInput.getIncome();
 
-        // check if tax rates are empty
         if (taxRates.isEmpty()) {
             throw new IllegalArgumentException("No tax rates found for the given year and status");
         }
 
-        // Iterate through the tax rates and calculate the tax paid for each bracket and create TaxPaidInfo objects
         for (int i = 0; i < taxRates.size(); i++) {
             TaxRate taxRate = taxRates.get(i);
             float rangeStart = taxRate.getRangeStart().floatValue();
@@ -168,20 +176,21 @@ public class TaxService {
         return taxPaidInfos;
     }
 
-    // get total tax paid
     public float getTotalTaxPaid(TaxInput taxInput) {
-        // Calculate the total tax paid by summing up the tax paid for each bracket
         return (float) calculateTax(taxInput).stream()
                 .mapToDouble(Float::floatValue)
                 .sum();
     }
 
-    // calculate tax breakdown
     public TaxPaidResponse calculateTaxBreakdown(TaxInput taxInput) throws IllegalArgumentException {
-
         validateTaxInput(taxInput);
 
-
+        if (isNoTaxYear(taxInput.getYear())) {
+            String msg = noTaxRepo.findById(taxInput.getYear())
+                    .map(NoIncomeTaxYear::getMessage)
+                    .orElse("No income tax for year " + taxInput.getYear());
+            return TaxPaidResponse.noIncomeTax(taxInput.getYear(), msg);
+        }
 
         List<TaxPaidInfo> taxPaidInfos = getTaxPaidInfo(taxInput);
         float totalTaxPaid = getTotalTaxPaid(taxInput);
@@ -192,9 +201,14 @@ public class TaxService {
 
     public TaxSummaryResponse getSummary(int year, FilingStatus status) throws IllegalArgumentException {
 
-        // Check if the year is valid
         if (isNotValidYear(year)) {
             throw new IllegalArgumentException("Invalid year: " + year);
+        }
+
+        if (isNoTaxYear(year)) {
+            String msg = noTaxRepo.findById(year).map(NoIncomeTaxYear::getMessage)
+                    .orElse("No income tax for year " + year);
+            return TaxSummaryResponse.noIncomeTax(year, status, msg);
         }
 
         List<TaxRate> taxRates = taxRateRepo.findByYearAndStatus(year, status);
@@ -218,7 +232,7 @@ public class TaxService {
 
         String averageRate = avgRateRaw == 0.0 ? "No Income Tax" : percentFormat(avgRateRaw);
 
-        return new TaxSummaryResponse(year, status, bracketCount, minThreshold, maxThreshold, averageRate);
+        return TaxSummaryResponse.normal(year, status, bracketCount, minThreshold, maxThreshold, averageRate);
     }
 
     public List<YearMetric> getHistory(
@@ -235,15 +249,31 @@ public class TaxService {
             throw new IllegalArgumentException("Unsupported metric: " + null);
         }
 
-        List<Integer> years = taxRateRepo.findByStatus(status).stream()
+        List<Integer> bracketYears = taxRateRepo.findByStatus(status).stream()
                 .map(TaxRate::getYear)
                 .distinct()
                 .sorted()
                 .filter(year -> year >= startYear && year <= endYear)
                 .toList();
 
+        List<Integer> noTaxYears = noTaxRepo.findAll().stream()
+                .map(NoIncomeTaxYear::getYear)
+                .filter(year -> year >= startYear && year <= endYear)
+                .toList();
+
+        List<Integer> years = Stream.concat(bracketYears.stream(), noTaxYears.stream())
+                .distinct()
+                .sorted()
+                .toList();
+
         return years.stream().map(y -> {
             List<TaxRate> rates = taxRateRepo.findByYearAndStatus(y, status);
+            if (noTaxYears.contains(y)) {
+                String msg = noTaxRepo.findById(y)
+                        .map(NoIncomeTaxYear::getMessage)
+                        .orElse("No income tax for year " + y);
+                return new YearMetric(y, metric, msg);
+            }
             String val;
             switch (metric) {
                 case TOP_RATE -> {
