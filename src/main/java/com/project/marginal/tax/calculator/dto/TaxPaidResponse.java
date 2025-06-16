@@ -33,11 +33,11 @@ public class TaxPaidResponse {
     public TaxPaidResponse(List<TaxPaidInfo> brackets, float totalTaxPaid, float avgRate, String message) {
         this.brackets = brackets;
         this.totalTaxPaid = dollarFormat(totalTaxPaid);
-        this.avgRate = avgRate == 0 ? "No Income Tax" : percentFormat(avgRate);
+        this.avgRate = percentFormat(avgRate);
         this.message = message;
     }
 
-    public static TaxPaidResponse noIncomeTax(int year, String message) {
+    public static TaxPaidResponse noIncomeTax(String message) {
         return new TaxPaidResponse(Collections.emptyList(), 0f, 0f, message);
     }
 

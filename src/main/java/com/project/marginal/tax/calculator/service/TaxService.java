@@ -189,7 +189,7 @@ public class TaxService {
             String msg = noTaxRepo.findById(taxInput.getYear())
                     .map(NoIncomeTaxYear::getMessage)
                     .orElse("No income tax for year " + taxInput.getYear());
-            return TaxPaidResponse.noIncomeTax(taxInput.getYear(), msg);
+            return TaxPaidResponse.noIncomeTax(msg);
         }
 
         List<TaxPaidInfo> taxPaidInfos = getTaxPaidInfo(taxInput);
@@ -272,7 +272,7 @@ public class TaxService {
                 String msg = noTaxRepo.findById(y)
                         .map(NoIncomeTaxYear::getMessage)
                         .orElse("No income tax for year " + y);
-                return new YearMetric(y, metric, msg);
+                return  YearMetric.noIncomeTax(y, metric, msg);
             }
             String val;
             switch (metric) {

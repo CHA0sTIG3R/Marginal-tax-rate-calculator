@@ -1,6 +1,5 @@
 package com.project.marginal.tax.calculator.dto;
 
-import com.project.marginal.tax.calculator.entity.FilingStatus;
 import lombok.Getter;
 
 @Getter

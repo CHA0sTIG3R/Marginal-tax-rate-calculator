@@ -12,7 +12,6 @@
 package com.project.marginal.tax.calculator.dto;
 
 import com.project.marginal.tax.calculator.entity.FilingStatus;
-import com.project.marginal.tax.calculator.entity.NoIncomeTaxYear;
 import lombok.Getter;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.dollarFormat;
