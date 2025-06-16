@@ -53,12 +53,13 @@ public class TaxDataImportService {
             }
 
             for (BracketEntry entry : yearEntries) {
-                TaxRate tr = new TaxRate();
-                tr.setYear(entry.getYear());
-                tr.setStatus(entry.getStatus());
-                tr.setRangeStart(entry.getRangeStart());
-                tr.setRangeEnd(entry.getRangeEnd());
-                tr.setRate(entry.getRate());
+                TaxRate tr = new TaxRate(
+                        entry.getYear(),
+                        entry.getStatus(),
+                        entry.getRate(),
+                        entry.getRangeStart(),
+                        entry.getRangeEnd()
+                );
                 repo.save(tr);
             }
         }
