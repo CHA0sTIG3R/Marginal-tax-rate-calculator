@@ -3,6 +3,7 @@ package com.project.marginal.tax.calculator.service;
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
+import com.project.marginal.tax.calculator.repository.NoIncomeTaxYearRepository;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,12 +25,13 @@ import static org.mockito.Mockito.doThrow;
 public class TaxServiceTest {
 
     private TaxRateRepository repo;
+    private NoIncomeTaxYearRepository noTaxRepo;
     private TaxService service;
 
     @BeforeEach
     public void setUp() {
         repo = Mockito.mock(TaxRateRepository.class);
-        service = new TaxService(repo);
+        service = new TaxService(repo, noTaxRepo);
     }
 
     @Test
