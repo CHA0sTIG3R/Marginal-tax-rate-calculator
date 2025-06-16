@@ -13,7 +13,10 @@ package com.project.marginal.tax.calculator.service;
 
 import com.opencsv.exceptions.CsvValidationException;
 import com.project.marginal.tax.calculator.dto.BracketEntry;
+import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.entity.NoIncomeTaxYear;
 import com.project.marginal.tax.calculator.entity.TaxRate;
+import com.project.marginal.tax.calculator.repository.NoIncomeTaxYearRepository;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import com.project.marginal.tax.calculator.utility.CsvImportUtils;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,17 +34,33 @@ public class TaxDataImportService {
 
     private final CsvImportUtils csvUtil;
     private final TaxRateRepository repo;
+    private final NoIncomeTaxYearRepository noTaxRepo;
 
     public void importData(InputStream in) throws CsvValidationException, IOException {
         List<BracketEntry> entries = csvUtil.importFromStream(in);
-        for (BracketEntry entry : entries) {
-            TaxRate tr = new TaxRate();
-            tr.setYear(entry.getYear());
-            tr.setStatus(entry.getStatus());
-            tr.setRangeStart(entry.getRangeStart());
-            tr.setRangeEnd(entry.getRangeEnd());
-            tr.setRate(entry.getRate());
-            repo.save(tr);
+
+        Map<Integer, List<BracketEntry>> byYear = entries.stream()
+                .collect(Collectors.groupingBy(BracketEntry::getYear));
+
+        for (var e: byYear.entrySet()) {
+            Integer year = e.getKey();
+            List<BracketEntry> yearEntries = e.getValue();
+
+            if (yearEntries.size() == FilingStatus.values().length
+                    && yearEntries.stream().allMatch(x -> x.getRate() == 0)) {
+                noTaxRepo.save(new NoIncomeTaxYear(year));
+                continue;
+            }
+
+            for (BracketEntry entry : entries) {
+                TaxRate tr = new TaxRate();
+                tr.setYear(entry.getYear());
+                tr.setStatus(entry.getStatus());
+                tr.setRangeStart(entry.getRangeStart());
+                tr.setRangeEnd(entry.getRangeEnd());
+                tr.setRate(entry.getRate());
+                repo.save(tr);
+            }
         }
     }
 }
