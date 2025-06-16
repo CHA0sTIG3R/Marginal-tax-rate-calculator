@@ -15,5 +15,14 @@ import com.project.marginal.tax.calculator.entity.FilingStatus;
 import java.math.BigDecimal;
 
 public record TaxSummaryResponse(Integer year, FilingStatus status, int bracketCount, BigDecimal minThreshold,
-                                 BigDecimal maxThreshold, String averageRate) {
+                                 BigDecimal maxThreshold, String averageRate, String message) {
+
+    public static TaxSummaryResponse normal(Integer year, FilingStatus status, int bracketCount,
+                                                  BigDecimal minThreshold, BigDecimal maxThreshold, String averageRate) {
+        return new TaxSummaryResponse(year, status, bracketCount, minThreshold, maxThreshold, averageRate, null);
+    }
+
+    public static TaxSummaryResponse noIncomeTax(Integer year, FilingStatus status, String message) {
+        return new TaxSummaryResponse(year, status, 0, BigDecimal.ZERO, BigDecimal.ZERO, "No Income Tax", message);
+    }
 }

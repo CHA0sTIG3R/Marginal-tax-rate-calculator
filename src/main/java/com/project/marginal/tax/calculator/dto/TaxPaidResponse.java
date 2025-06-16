@@ -13,6 +13,7 @@ package com.project.marginal.tax.calculator.dto;
 
 import lombok.Getter;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.dollarFormat;
@@ -23,11 +24,21 @@ public class TaxPaidResponse {
     private final List<TaxPaidInfo> brackets;
     private final String totalTaxPaid;
     private final String avgRate;
+    private final String message;
 
     public TaxPaidResponse(List<TaxPaidInfo> brackets, float totalTaxPaid, float avgRate) {
+        this(brackets, totalTaxPaid, avgRate, null);
+    }
+
+    public TaxPaidResponse(List<TaxPaidInfo> brackets, float totalTaxPaid, float avgRate, String message) {
         this.brackets = brackets;
         this.totalTaxPaid = dollarFormat(totalTaxPaid);
         this.avgRate = avgRate == 0 ? "No Income Tax" : percentFormat(avgRate);
+        this.message = message;
+    }
+
+    public static TaxPaidResponse noIncomeTax(int year, String message) {
+        return new TaxPaidResponse(Collections.emptyList(), 0f, 0f, message);
     }
 
 }

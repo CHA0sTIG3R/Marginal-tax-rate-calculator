@@ -12,6 +12,7 @@
 package com.project.marginal.tax.calculator.dto;
 
 import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.entity.NoIncomeTaxYear;
 import lombok.Getter;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.dollarFormat;
@@ -24,13 +25,23 @@ public class TaxRateDto {
     private final String rangeStart;
     private final String rangeEnd;
     private final String rate;
+    private final String message;
 
     public TaxRateDto(int year, FilingStatus filingStatus, float rangeStart, float rangeEnd, float rate) {
+        this(year, filingStatus, rangeStart, rangeEnd, rate, null);
+    }
+
+    public TaxRateDto(int year, FilingStatus filingStatus, float rangeStart, float rangeEnd, float rate, String message) {
         this.year = year;
         this.filingStatus = filingStatus;
         this.rangeStart = dollarFormat(rangeStart);
         this.rangeEnd = rangeEnd == 0 ? "No Upper Limit" : dollarFormat(rangeEnd);
-        this.rate = rate == 0 ? "No Income Tax" : percentFormat(rate);
+        this.rate = percentFormat(rate);
+        this.message = message;
+    }
+
+    public static TaxRateDto noIncomeTax(int year, FilingStatus status, String message) {
+        return new TaxRateDto(year, status, 0f, 0f, 0f, message);
     }
 
 }
