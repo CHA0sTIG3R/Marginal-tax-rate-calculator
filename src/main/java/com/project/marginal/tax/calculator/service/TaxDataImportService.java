@@ -52,7 +52,7 @@ public class TaxDataImportService {
                 continue;
             }
 
-            for (BracketEntry entry : entries) {
+            for (BracketEntry entry : yearEntries) {
                 TaxRate tr = new TaxRate();
                 tr.setYear(entry.getYear());
                 tr.setStatus(entry.getStatus());
