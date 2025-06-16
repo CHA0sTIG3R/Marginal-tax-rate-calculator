@@ -1,5 +1,8 @@
 package com.project.marginal.tax.calculator.dto;
 
+import lombok.Getter;
+
+@Getter
 public class YearMetric {
     private final Integer year;
     private final String metric;
@@ -11,15 +14,4 @@ public class YearMetric {
         this.value = value;
     }
 
-    public Integer getYear() {
-        return year;
-    }
-
-    public String getMetric() {
-        return metric;
-    }
-
-    public String getValue() {
-        return value;
-    }
 }

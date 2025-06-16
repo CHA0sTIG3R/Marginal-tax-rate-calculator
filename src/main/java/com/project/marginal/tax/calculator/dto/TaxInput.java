@@ -12,14 +12,17 @@
 package com.project.marginal.tax.calculator.dto;
 
 import com.project.marginal.tax.calculator.entity.FilingStatus;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@Setter
+@Getter
 public class TaxInput {
     private Integer year;
     private FilingStatus status;
     private Float income;
-
-    public TaxInput() {
-    }
 
     public TaxInput(Integer year, FilingStatus status, String income) {
         this.year = year;
@@ -39,27 +42,4 @@ public class TaxInput {
         }
     }
 
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public FilingStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(FilingStatus status) {
-        this.status = status;
-    }
-
-    public Float getIncome() {
-        return income;
-    }
-
-    public void setIncome(Float income) {
-        this.income = income;
-    }
 }

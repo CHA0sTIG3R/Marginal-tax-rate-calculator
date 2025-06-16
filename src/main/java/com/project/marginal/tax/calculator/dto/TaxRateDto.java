@@ -12,10 +12,12 @@
 package com.project.marginal.tax.calculator.dto;
 
 import com.project.marginal.tax.calculator.entity.FilingStatus;
+import lombok.Getter;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.dollarFormat;
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
+@Getter
 public class TaxRateDto {
     private final Integer year;
     private final FilingStatus filingStatus;
@@ -29,26 +31,6 @@ public class TaxRateDto {
         this.rangeStart = dollarFormat(rangeStart);
         this.rangeEnd = rangeEnd == 0 ? "No Upper Limit" : dollarFormat(rangeEnd);
         this.rate = rate == 0 ? "No Income Tax" : percentFormat(rate);
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public FilingStatus getFilingStatus() {
-        return filingStatus;
-    }
-
-    public String getRangeStart() {
-        return rangeStart;
-    }
-
-    public String getRangeEnd() {
-        return rangeEnd;
-    }
-
-    public String getRate() {
-        return rate;
     }
 
 }

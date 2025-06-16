@@ -12,6 +12,7 @@
 package com.project.marginal.tax.calculator.dto;
 
 import com.project.marginal.tax.calculator.entity.FilingStatus;
+import lombok.Getter;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.dollarFormat;
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
@@ -22,9 +23,10 @@ import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.perc
  * This class is used to explain the tax paid information per bracket for a given year and filing status.
  * </p>
  */
+@Getter
 public class TaxPaidInfo {
-    private Integer year;
-    private FilingStatus status;
+    private final Integer year;
+    private final FilingStatus status;
     private final String rangeStart;
     private final String rangeEnd;
     private final String taxRate;
@@ -37,26 +39,6 @@ public class TaxPaidInfo {
         this.rangeEnd = dollarFormat(rangeEnd);
         this.taxRate = percentFormat(taxRate);
         this.taxPaid = dollarFormat(taxPaid);
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public FilingStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(FilingStatus status) {
-        this.status = status;
-    }
-
-    public String getRangeStart() {
-        return rangeStart;
     }
 
     @Override

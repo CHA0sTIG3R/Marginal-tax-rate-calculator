@@ -11,11 +11,14 @@
 
 package com.project.marginal.tax.calculator.dto;
 
+import lombok.Getter;
+
 import java.util.List;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.dollarFormat;
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 
+@Getter
 public class TaxPaidResponse {
     private final List<TaxPaidInfo> brackets;
     private final String totalTaxPaid;
@@ -26,14 +29,5 @@ public class TaxPaidResponse {
         this.totalTaxPaid = dollarFormat(totalTaxPaid);
         this.avgRate = avgRate == 0 ? "No Income Tax" : percentFormat(avgRate);
     }
-    public List<TaxPaidInfo> getBrackets() {
-        return brackets;
-    }
-    public String getTotalTaxPaid() {
-        return totalTaxPaid;
-    }
 
-    public String getAvgRate() {
-        return avgRate;
-    }
 }
