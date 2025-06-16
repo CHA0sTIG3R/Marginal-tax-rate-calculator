@@ -19,10 +19,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -265,4 +268,21 @@ public class TaxControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(0)));
     }
+
+    @Test
+    void simulateBulk_performance() {
+        List<TaxInput> inputs = IntStream.range(0,500)
+                .mapToObj(i -> new TaxInput(2021, FilingStatus.S, "100000"))
+                .toList();
+        when(taxService.simulateBulk(anyList()))
+                .thenReturn(inputs.stream()
+                        .map(input -> new TaxPaidResponse(List.of(), 1000f, 0.10f))
+                        .toList());
+        long start = System.nanoTime();
+        List<TaxPaidResponse> results = taxService.simulateBulk(inputs);
+        long elapsedMs = (System.nanoTime() - start)/1_000_000;
+        assertEquals(500, results.size());
+        assertTrue(elapsedMs < 2000, "simulateBulk too slow: " + elapsedMs + "ms");
+    }
+
 }
