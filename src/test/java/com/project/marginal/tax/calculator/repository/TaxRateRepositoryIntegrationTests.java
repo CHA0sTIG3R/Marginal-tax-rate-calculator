@@ -2,23 +2,36 @@ package com.project.marginal.tax.calculator.repository;
 
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.Assert.*;
-
-@RunWith(SpringRunner.class)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @DataJpaTest
+@Testcontainers
+@ActiveProfiles("test")
 public class TaxRateRepositoryIntegrationTests {
+
+    @Container
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+
+    @DynamicPropertySource
+    static void props(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @Autowired
     private TaxRateRepository repository;
@@ -34,8 +47,8 @@ public class TaxRateRepositoryIntegrationTests {
         repository.save(tr);
 
         List<TaxRate> found = repository.findByYear(2023);
-        assertFalse(found.isEmpty());
-        assertEquals(Optional.of(2023), Optional.of(found.get(0).getYear()));
+        Assertions.assertFalse(found.isEmpty());
+        Assertions.assertEquals(Optional.of(2023), Optional.of(found.get(0).getYear()));
     }
 
     @Test
@@ -46,8 +59,8 @@ public class TaxRateRepositoryIntegrationTests {
         repository.save(b);
 
         List<TaxRate> mfj = repository.findByStatus(FilingStatus.MFJ);
-        assertEquals(2, mfj.size());
-        assertTrue(mfj.stream().allMatch(r -> r.getStatus() == FilingStatus.MFJ));
+        Assertions.assertEquals(2, mfj.size());
+        Assertions.assertTrue(mfj.stream().allMatch(r -> r.getStatus() == FilingStatus.MFJ));
     }
 
 }
