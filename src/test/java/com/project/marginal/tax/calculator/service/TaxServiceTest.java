@@ -2,6 +2,7 @@ package com.project.marginal.tax.calculator.service;
 
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.entity.NoIncomeTaxYear;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import com.project.marginal.tax.calculator.repository.NoIncomeTaxYearRepository;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
@@ -12,6 +13,8 @@ import org.mockito.Mockito;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.percentFormat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,6 +34,7 @@ public class TaxServiceTest {
     @BeforeEach
     public void setUp() {
         repo = Mockito.mock(TaxRateRepository.class);
+        noTaxRepo = Mockito.mock(NoIncomeTaxYearRepository.class);
         service = new TaxService(repo, noTaxRepo);
     }
 
@@ -47,6 +51,31 @@ public class TaxServiceTest {
     }
 
     @Test
+    public void listYears_includesBracketAndNoTaxYears_sortedDistinct() {
+        when(repo.findAll()).thenReturn(List.of(
+                new TaxRate(2020, FilingStatus.S, 0f,BigDecimal.ZERO, BigDecimal.ZERO),
+                new TaxRate(2021, FilingStatus.MFJ, 0f, BigDecimal.ZERO, BigDecimal.ZERO)
+        ));
+        when(noTaxRepo.findAll()).thenReturn(List.of(new NoIncomeTaxYear(2019)));
+        List<Integer> years = service.listYears();
+        assertEquals(List.of(2019, 2020, 2021), years);
+    }
+
+    @Test
+    public void getRates_invalidYear_throws() {
+        int tooOld = 1800;
+        assertThrows(IllegalArgumentException.class, () -> service.getRates(tooOld, null));
+    }
+
+    @Test
+    public void getFilingStatus_returnsEnumMap() {
+        Map<String, String> statuses = service.getFilingStatus();
+        assertTrue(statuses.containsKey(FilingStatus.S.name()));
+        assertEquals("Single", statuses.get("S"));
+    }
+
+
+    @Test
     public void testGetRatesByYear() {
         TaxRate tr = new TaxRate(2021, FilingStatus.S, 0.10f, new BigDecimal("0"), new BigDecimal("50000"));
         when(repo.findByYear(2021)).thenReturn(List.of(tr));
@@ -57,6 +86,45 @@ public class TaxServiceTest {
         assertEquals(2021, dto.getYear());
         assertEquals(FilingStatus.S, dto.getFilingStatus());
     }
+
+    @Test
+    public void getRates_noTaxYear_returnsNoIncomeTaxDto() {
+        int year = 1895;
+        when(noTaxRepo.existsById(year)).thenReturn(true);
+        when(noTaxRepo.findById(year)).thenReturn(Optional.of(new NoIncomeTaxYear(year)));
+        List<TaxRateDto> dtos = service.getRates(year, FilingStatus.S);
+        assertEquals(1, dtos.size());
+        TaxRateDto dto = dtos.get(0);
+        assertEquals(year, dto.getYear());
+        assertEquals(FilingStatus.S, dto.getFilingStatus());
+        assertEquals("$0.00", dto.getRangeStart());
+        assertEquals("No Upper Limit", dto.getRangeEnd());
+        assertEquals("0%", dto.getRate());
+        assertTrue(dto.getMessage().contains("No income tax"));
+    }
+
+    @Test
+    public void getRates_nullStatus_returnsAllStatuses() {
+        int year = 2021;
+        TaxRate r1 = new TaxRate(year, FilingStatus.S,  0.1f, BigDecimal.ZERO, BigDecimal.TEN);
+        when(noTaxRepo.existsById(year)).thenReturn(false);
+        when(repo.findByYear(year)).thenReturn(List.of(r1));
+        List<TaxRateDto> dtos = service.getRates(year, null);
+        assertEquals(1, dtos.size());
+        assertEquals(FilingStatus.S, dtos.get(0).getFilingStatus());
+    }
+
+    @Test
+    public void getRates_withStatus_returnsFiltered() {
+        int year = 2021;
+        TaxRate r1 = new TaxRate(year, FilingStatus.MFJ, 0.1f, BigDecimal.ZERO, BigDecimal.TEN);
+        when(noTaxRepo.existsById(year)).thenReturn(false);
+        when(repo.findByYearAndStatus(year, FilingStatus.MFJ)).thenReturn(List.of(r1));
+        List<TaxRateDto> dtos = service.getRates(year, FilingStatus.MFJ);
+        assertEquals(1, dtos.size());
+        assertEquals(FilingStatus.MFJ, dtos.get(0).getFilingStatus());
+    }
+
 
     @Test
     public void testCalculateTaxBreakdownInvalidYear() {
@@ -80,6 +148,45 @@ public class TaxServiceTest {
         when(repo.findByYearAndStatusAndRangeStartLessThan(eq(2021), eq(FilingStatus.S), any())).thenReturn(List.of(tr));
         TaxPaidResponse response = service.calculateTaxBreakdown(input);
         assertTrue(response.getTotalTaxPaid().contains("5,000"));
+    }
+
+    @Test
+    public void getSummary_invalidYear_throws() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.getSummary(1700, FilingStatus.S));
+    }
+
+    @Test
+    public void getSummary_noTaxYear_returnsNoIncomeTaxSummary() {
+        int year = 2024;
+        when(noTaxRepo.existsById(year)).thenReturn(true);
+        when(noTaxRepo.findById(year)).thenReturn(Optional.of(new NoIncomeTaxYear(year)));
+        TaxSummaryResponse resp = service.getSummary(year, FilingStatus.S);
+        assertEquals(year, resp.year());
+        assertEquals(FilingStatus.S, resp.status());
+        assertEquals(0, resp.bracketCount());
+        assertEquals("No Income Tax", resp.averageRate());
+        assertEquals(BigDecimal.ZERO, resp.minThreshold());
+        assertEquals(BigDecimal.ZERO, resp.maxThreshold());
+    }
+
+    @Test
+    public void getSummary_normalYear_returnsCorrectSummary() {
+        int year = 2022;
+        when(noTaxRepo.existsById(year)).thenReturn(false);
+        TaxRate t1 = new TaxRate(year, FilingStatus.S, 0.10f, BigDecimal.ZERO, new BigDecimal("5000"));
+        TaxRate t2 = new TaxRate(year, FilingStatus.S, 0.20f, new BigDecimal("5000"), new BigDecimal("10000"));
+        when(repo.findByYearAndStatus(year, FilingStatus.S)).thenReturn(List.of(t1, t2));
+
+        TaxSummaryResponse resp = service.getSummary(year, FilingStatus.S);
+        assertEquals(year, resp.year());
+        assertEquals(FilingStatus.S, resp.status());
+        assertEquals(2, resp.bracketCount());
+        assertEquals("15%", resp.averageRate());
+        assertEquals(2, resp.bracketCount());
+        assertEquals(BigDecimal.ZERO, resp.minThreshold());
+        assertEquals(new BigDecimal("10000"), resp.maxThreshold());
+        assertTrue(resp.averageRate().endsWith("%"));
     }
 
     @Test
@@ -113,24 +220,7 @@ public class TaxServiceTest {
                 () -> service.getHistory(FilingStatus.S, Metric.valueOf("new metric"), 2020, 2021));
     }
 
-    @Test
-    public void testSimulateBulk() {
-        TaxService spySvc = Mockito.spy(service);
-        TaxPaidResponse dummy = new TaxPaidResponse(List.of(), 1000f, 0.10f);
-        doReturn(dummy).when(spySvc).calculateTaxBreakdown(any(TaxInput.class));
-
-        List<TaxInput> inputs = List.of(
-                new TaxInput(2021, FilingStatus.S, "50000"),
-                new TaxInput(2021, FilingStatus.MFJ, "80000")
-        );
-        List<TaxPaidResponse> results = spySvc.simulateBulk(inputs);
-
-        assertEquals(2, results.size());
-        assertSame(dummy, results.get(0));
-        assertSame(dummy, results.get(1));
-    }
-
-    @Test
+        @Test
     public void calculateTaxBreakdown_yearBelowData_throws() {
         TaxInput input = new TaxInput(1800, FilingStatus.S, "50000");
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
@@ -219,6 +309,23 @@ public class TaxServiceTest {
     }
 
     @Test
+    public void testSimulateBulk() {
+        TaxService spySvc = Mockito.spy(service);
+        TaxPaidResponse dummy = new TaxPaidResponse(List.of(), 1000f, 0.10f);
+        doReturn(dummy).when(spySvc).calculateTaxBreakdown(any(TaxInput.class));
+
+        List<TaxInput> inputs = List.of(
+                new TaxInput(2021, FilingStatus.S, "50000"),
+                new TaxInput(2021, FilingStatus.MFJ, "80000")
+        );
+        List<TaxPaidResponse> results = spySvc.simulateBulk(inputs);
+
+        assertEquals(2, results.size());
+        assertSame(dummy, results.get(0));
+        assertSame(dummy, results.get(1));
+    }
+
+    @Test
     public void simulateBulk_mixedInputs_exceptionBubbles() {
         TaxInput good = new TaxInput(2021, FilingStatus.S, "1000");
         TaxInput bad  = new TaxInput(1800, FilingStatus.S, "5000"); // invalid year
@@ -232,6 +339,20 @@ public class TaxServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> spySvc.simulateBulk(List.of(good, bad)));
+    }
+
+    @Test
+    void simulateBulk_mixedInputs_bubblesException() {
+        TaxInput good = new TaxInput(2021, FilingStatus.S, "10000");
+        TaxInput bad  = new TaxInput(1800, FilingStatus.S, "1000");
+        TaxService spy = spy(service);
+        doReturn(new TaxPaidResponse(List.of(), 100f, 0.10f))
+                .when(spy).calculateTaxBreakdown(argThat(i -> i.getYear() == 2021));
+        doThrow(new IllegalArgumentException("Invalid year"))
+                .when(spy).calculateTaxBreakdown(argThat(i -> i.getYear() == 1800));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> spy.simulateBulk(List.of(good, bad)));
     }
 
 }
