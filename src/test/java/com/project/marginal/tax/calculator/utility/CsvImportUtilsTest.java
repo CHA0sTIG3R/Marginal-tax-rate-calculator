@@ -4,8 +4,11 @@ import com.project.marginal.tax.calculator.dto.BracketEntry;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CsvImportUtilsTest {
 
     private CsvImportUtils csvUtil;
+    private S3Client s3Client;
     private final String HEADER;
 
     public CsvImportUtilsTest() {
@@ -25,6 +29,7 @@ public class CsvImportUtilsTest {
     @BeforeEach
     public void setUp() {
         csvUtil = new CsvImportUtils();
+        s3Client = S3Client.builder().build(); // Mock or real S3 client as needed
     }
 
     @Test
@@ -106,4 +111,18 @@ public class CsvImportUtilsTest {
         assertEquals(BigDecimal.ZERO, mfj.getRangeStart());
         assertNull(mfj.getRangeEnd());
     }
+
+    @Test
+    public void importPerformance() throws Exception {
+        InputStream in = s3Client.getObject(
+                GetObjectRequest.builder()
+                        .bucket("marginal-tax-rate-calculator-hamza")
+                        .key("irs/irs_historical.csv")
+                        .build());
+        long start = System.nanoTime();
+        List<BracketEntry> entries = csvUtil.importFromStream(in);
+        long elapsedSec = (System.nanoTime() - start)/1_000_000_000;
+        assertTrue(elapsedSec < 10, "Import took too long: " + elapsedSec + "s");
+    }
+
 }
