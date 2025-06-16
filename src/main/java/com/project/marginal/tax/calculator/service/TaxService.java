@@ -38,6 +38,23 @@ public class TaxService {
         return year < MIN_YEAR || year > MAX_YEAR;
     }
 
+    private void validateTaxInput(TaxInput taxInput) {
+        // Check if the year is valid and the rate is not 0
+        if (isNotValidYear(taxInput.getYear())) {
+            throw new IllegalArgumentException("Invalid year: " + taxInput.getYear());
+        }
+
+        // Check if the income is a valid number
+        if (taxInput.getIncome() <= 0) {
+            throw new IllegalArgumentException("Income must be greater than 0");
+        }
+
+        // validate status
+        if (taxInput.getStatus() == null) {
+            throw new IllegalArgumentException("Filing status must be provided");
+        }
+    }
+
     public List<Integer> listYears() {
         return taxRateRepo.findAll().stream()
                 .map(TaxRate::getYear)
@@ -164,30 +181,14 @@ public class TaxService {
 
         validateTaxInput(taxInput);
 
+
+
         List<TaxPaidInfo> taxPaidInfos = getTaxPaidInfo(taxInput);
         float totalTaxPaid = getTotalTaxPaid(taxInput);
         float avgRate = totalTaxPaid / taxInput.getIncome();
 
         return new TaxPaidResponse(taxPaidInfos, totalTaxPaid, avgRate);
     }
-
-    private void validateTaxInput(TaxInput taxInput) {
-        // Check if the year is valid and the rate is not 0
-        if (isNotValidYear(taxInput.getYear())) {
-            throw new IllegalArgumentException("Invalid year: " + taxInput.getYear());
-        }
-
-        // Check if the income is a valid number
-        if (taxInput.getIncome() <= 0) {
-            throw new IllegalArgumentException("Income must be greater than 0");
-        }
-
-        // validate status
-        if (taxInput.getStatus() == null) {
-            throw new IllegalArgumentException("Filing status must be provided");
-        }
-    }
-
 
     public TaxSummaryResponse getSummary(int year, FilingStatus status) throws IllegalArgumentException {
 
