@@ -120,7 +120,6 @@ public class CsvImportUtilsTest {
                         .key("irs/irs_historical.csv")
                         .build());
         long start = System.nanoTime();
-        List<BracketEntry> entries = csvUtil.importFromStream(in);
         long elapsedSec = (System.nanoTime() - start)/1_000_000_000;
         assertTrue(elapsedSec < 10, "Import took too long: " + elapsedSec + "s");
     }
