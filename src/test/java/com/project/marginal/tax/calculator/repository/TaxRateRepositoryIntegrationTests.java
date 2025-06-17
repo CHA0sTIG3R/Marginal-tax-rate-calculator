@@ -3,6 +3,7 @@ package com.project.marginal.tax.calculator.repository;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.test.context.ActiveProfiles;
+
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -21,7 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TaxRateRepositoryIntegrationTests {
 
     @Container
@@ -37,6 +39,13 @@ public class TaxRateRepositoryIntegrationTests {
 
     @Autowired
     private TaxRateRepository repository;
+
+    @AfterAll
+    public static void cleanup(){
+        if (postgres.isRunning()) {
+            postgres.stop();
+        }
+    }
 
     @Test
     public void saveAndFindByYear() {

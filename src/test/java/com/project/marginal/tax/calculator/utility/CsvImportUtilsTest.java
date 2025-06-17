@@ -22,14 +22,13 @@ public class CsvImportUtilsTest {
     private final String HEADER;
 
     public CsvImportUtilsTest() {
-        // 13 dummy columns: importer only cares that there are >= 13 columns
         HEADER = "c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12\n";
     }
 
     @BeforeEach
     public void setUp() {
         csvUtil = new CsvImportUtils();
-        s3Client = S3Client.builder().build(); // Mock or real S3 client as needed
+        s3Client = S3Client.builder().build();
     }
 
     @Test
@@ -43,14 +42,12 @@ public class CsvImportUtilsTest {
 
     @Test
     public void extraColumns_areIgnored() throws Exception {
-        // 15 columns: indices 0–12 used, 13–14 ignored
         String hdr = HEADER.replaceFirst("c12", "c12,c13,c14");
         String row = "2023,10%,$0,$5000,12%,$0,$6000,14%,$0,$7000,16%,$0,$8000,foo,bar\n";
 
         List<BracketEntry> entries = csvUtil.importFromStream(
                 new ByteArrayInputStream((hdr + row).getBytes())
         );
-        // One data row → 4 statuses → 4 entries
         assertEquals(4, entries.size());
 
         BracketEntry mfj = entries.stream()
@@ -68,14 +65,12 @@ public class CsvImportUtilsTest {
         List<BracketEntry> entries = csvUtil.importFromStream(
                 new ByteArrayInputStream((HEADER + blankRow + validRow).getBytes())
         );
-        // Only the validRow yields 4 entries
         assertEquals(4, entries.size());
         assertTrue(entries.stream().allMatch(e -> e.getYear() == 2023));
     }
 
     @Test
     public void normalRows_parseCorrectly() throws Exception {
-        // Two rows × 4 statuses = 8 entries
         String row1 = "2022,10%,$0,$1000,12%,$0,$2000,14%,$0,$3000,16%,$0,$4000\n";
         String row2 = "2022,18%,$1000,$2000,20%,$2000,$3000,22%,$3000,$4000,24%,$4000,$5000\n";
         List<BracketEntry> entries = csvUtil.importFromStream(
@@ -83,7 +78,6 @@ public class CsvImportUtilsTest {
         );
         assertEquals(8, entries.size());
 
-        // Spot-check S brackets: rangeStart 0 & 3000, rangeEnd 3000 & 4000
         List<BracketEntry> sBrackets = entries.stream()
                 .filter(e -> e.getStatus() == FilingStatus.S)
                 .sorted(Comparator.comparing(BracketEntry::getRangeStart))
