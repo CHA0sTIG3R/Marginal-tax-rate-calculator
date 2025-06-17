@@ -1,6 +1,5 @@
 package com.project.marginal.tax.calculator;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -16,7 +15,15 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class MarginalTaxRateCalculatorApplicationTests {
 
 	@Container
-	private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+	private static final PostgreSQLContainer<?> postgres;
+
+	static {
+        //noinspection resource
+        postgres = new PostgreSQLContainer<>("postgres:15")
+				.withDatabaseName("testdb")
+				.withUsername("test")
+				.withPassword("test");
+	}
 
 	@DynamicPropertySource
 	static void props(DynamicPropertyRegistry registry) {
@@ -24,11 +31,6 @@ class MarginalTaxRateCalculatorApplicationTests {
 		registry.add("spring.datasource.username", postgres::getUsername);
 		registry.add("spring.datasource.password", postgres::getPassword);
 		registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-	}
-
-	@AfterAll
-	static void cleanup() {
-		postgres.stop();
 	}
 
 	@Test
