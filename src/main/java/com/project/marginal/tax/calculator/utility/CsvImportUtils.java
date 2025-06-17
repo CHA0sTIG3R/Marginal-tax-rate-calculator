@@ -62,7 +62,7 @@ public class CsvImportUtils {
                     insertTaxRate(year, FilingStatus.S, line[7], line[8], line[9]);
                 }
                 if (!(line[10].isEmpty() && line[1].isEmpty())) {
-                    insertTaxRate(year, FilingStatus.HH, line[10], line[11], line[12]);
+                    insertTaxRate(year, FilingStatus.HOH, line[10], line[11], line[12]);
                 }
             }
         }

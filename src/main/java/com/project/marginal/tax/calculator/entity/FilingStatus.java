@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public enum FilingStatus {
     S("Single"),
-    HH("Head of Household"),
+    HOH("Head of Household"),
     MFJ("Married Filing Jointly"),
     MFS("Married Filing Separately");
 
