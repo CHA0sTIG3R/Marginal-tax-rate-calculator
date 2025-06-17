@@ -101,7 +101,7 @@
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>LATEST</version>
+			<version>26.0.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
