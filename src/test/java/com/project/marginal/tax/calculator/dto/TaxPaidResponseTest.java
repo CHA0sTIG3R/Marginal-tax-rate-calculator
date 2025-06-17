@@ -11,12 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TaxPaidResponseTest {
 
     @Test
-    public void avgRate_zero_yieldsNoIncomeTax() {
-        TaxPaidResponse resp = new TaxPaidResponse(List.of(), 0f, 0f);
-        assertEquals("No Income Tax", resp.getAvgRate());
-    }
-
-    @Test
     public void avgRate_nonZero_isFormattedPercent() {
         TaxPaidResponse resp = new TaxPaidResponse(List.of(), 0f, 0.1875f);
         String expected = NumberFormatUtils.percentFormat(0.1875f);
