@@ -115,9 +115,6 @@ public class CsvImportUtilsTest {
 
     @Test
     public void importPerformance() throws Exception {
-        assumeTrue(System.getenv("AWS_ACCESS_KEY_ID") != null,
-                "Skipping full-CSV perf test: no AWS credentials");
-
         InputStream in = s3Client.getObject(
                 GetObjectRequest.builder()
                         .bucket("marginal-tax-rate-calculator-hamza")
