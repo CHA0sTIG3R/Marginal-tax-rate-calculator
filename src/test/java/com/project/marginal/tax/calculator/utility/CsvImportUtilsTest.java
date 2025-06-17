@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class CsvImportUtilsTest {
 
@@ -114,6 +115,9 @@ public class CsvImportUtilsTest {
 
     @Test
     public void importPerformance() throws Exception {
+        assumeTrue(System.getenv("AWS_ACCESS_KEY_ID") != null,
+                "Skipping full-CSV perf test: no AWS credentials");
+
         InputStream in = s3Client.getObject(
                 GetObjectRequest.builder()
                         .bucket("marginal-tax-rate-calculator-hamza")
