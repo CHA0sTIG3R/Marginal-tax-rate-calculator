@@ -150,7 +150,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
+					<forkedProcessExitTimeoutInSeconds>5</forkedProcessExitTimeoutInSeconds>
 				</configuration>
 			</plugin>
 		</plugins>
