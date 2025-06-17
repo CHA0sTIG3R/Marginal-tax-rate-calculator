@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: us-east-1
