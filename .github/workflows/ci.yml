@@ -35,4 +35,4 @@ jobs:
               ${{ runner.os }}-m2-
 
       - name: Build & run tests
-        run: mvn clean test
+        run: mvn clean test -Dspring.profiles.active=test
