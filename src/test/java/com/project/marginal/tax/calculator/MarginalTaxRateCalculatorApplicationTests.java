@@ -1,5 +1,6 @@
 package com.project.marginal.tax.calculator;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +24,11 @@ class MarginalTaxRateCalculatorApplicationTests {
 		registry.add("spring.datasource.username", postgres::getUsername);
 		registry.add("spring.datasource.password", postgres::getPassword);
 		registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+	}
+
+	@AfterAll
+	static void cleanup() {
+		postgres.stop();
 	}
 
 	@Test
