@@ -3,9 +3,12 @@ package com.project.marginal.tax.calculator.exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.marginal.tax.calculator.controller.TaxController;
 import com.project.marginal.tax.calculator.dto.TaxInput;
+import com.project.marginal.tax.calculator.security.ApiKeyFilter;
+import com.project.marginal.tax.calculator.service.TaxDataImportService;
 import com.project.marginal.tax.calculator.service.TaxService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -24,12 +27,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = TaxController.class)
 @Import(GlobalExceptionHandler.class)
+@AutoConfigureMockMvc(addFilters = false) // Disable default filters to use custom ApiKeyFilter
 public class ExceptionHandlingIntegrationTest {
 
     @Autowired
     private MockMvc mvc;
     @MockitoBean
     private TaxService taxService;
+    @MockitoBean
+    private TaxDataImportService importService;
+
+    @MockitoBean
+    private ApiKeyFilter apiKeyFilter; // Mock the ApiKeyFilter to avoid actual API key checks
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
