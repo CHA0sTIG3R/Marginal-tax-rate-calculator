@@ -13,10 +13,13 @@ package com.project.marginal.tax.calculator.controller;
 
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
+import com.project.marginal.tax.calculator.service.TaxDataImportService;
 import com.project.marginal.tax.calculator.service.TaxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +30,25 @@ import java.util.Map;
 public class TaxController {
 
     private final TaxService service;
+    private final TaxDataImportService importService;
+
+    @PostMapping(
+            path = "/upload",
+            consumes = "text/csv",
+            produces = "application/json"
+    )
+    public String updateTaxRates(@RequestBody byte[] csvData) {
+        try (InputStream in = new ByteArrayInputStream(csvData)) {
+            importService.importData(in);
+            System.out.println("Tax rates updated successfully.");
+            return "Tax rates updated successfully.";
+        }
+        catch (Exception e) {
+            System.err.println("Failed to update tax rates: " + e.getMessage());
+            return "Failed to update tax rates: " + e.getMessage();
+        }
+    }
+
 
     @GetMapping("/years")
     public List<Integer> getYears() {

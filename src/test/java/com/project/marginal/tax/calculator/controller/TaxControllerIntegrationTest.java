@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.marginal.tax.calculator.dto.*;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.exception.GlobalExceptionHandler;
+import com.project.marginal.tax.calculator.security.ApiKeyFilter;
+import com.project.marginal.tax.calculator.service.TaxDataImportService;
 import com.project.marginal.tax.calculator.service.TaxService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -23,8 +26,8 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(controllers = TaxController.class)
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, ApiKeyFilter.class})
 public class TaxControllerIntegrationTest {
 
     @Autowired
@@ -40,6 +43,12 @@ public class TaxControllerIntegrationTest {
 
     @MockitoBean
     private TaxService service;
+
+    @MockitoBean
+    private TaxDataImportService importService;
+
+    @Value("${app.ingest.api-key}")
+    private String apiKey;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -315,6 +324,23 @@ public class TaxControllerIntegrationTest {
         long elapsedMs = (System.nanoTime() - start)/1_000_000;
         assertEquals(500, results.size());
         assertTrue(elapsedMs < 2000, "simulateBulk too slow: " + elapsedMs + "ms");
+    }
+
+    @Test
+    public void uploadWithoutKeyIsUnauthorized() throws Exception {
+        mockMvc.perform(post("/api/v1/tax/upload")
+                        .contentType("text/csv")
+                        .content("dummy"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void uploadWithKeyIsAccepted() throws Exception {
+        mockMvc.perform(post("/api/v1/tax/upload")
+                        .header("X-API-Key", apiKey)
+                        .contentType("text/csv")
+                        .content("dummy"))
+                .andExpect(status().isOk());
     }
 
 }
