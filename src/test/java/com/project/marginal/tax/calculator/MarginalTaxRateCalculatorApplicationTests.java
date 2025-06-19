@@ -10,7 +10,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-@SpringBootTest(classes = MarginalTaxRateCalculatorApplication.class)
+@SpringBootTest(
+		classes = MarginalTaxRateCalculatorApplication.class,
+		properties = {
+				"app.ingest.api-key = test-api-key",
+		}
+)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class MarginalTaxRateCalculatorApplicationTests {
 
