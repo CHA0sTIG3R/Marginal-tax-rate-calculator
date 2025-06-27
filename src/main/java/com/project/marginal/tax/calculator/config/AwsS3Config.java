@@ -13,7 +13,6 @@ public class AwsS3Config {
     public S3Client s3Client() {
         return S3Client.builder()
                 .region(Region.US_EAST_1)
-                .credentialsProvider(ProfileCredentialsProvider.create("taxcalc"))
                 .build();
     }
 }
