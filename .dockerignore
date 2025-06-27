@@ -1,0 +1,4 @@
+# prevent build-context bloat
+.git
+application.properties
+.env
