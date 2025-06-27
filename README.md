@@ -21,7 +21,7 @@ This application exposes historical tax brackets and metrics, and calculates lia
 | `POST /api/v1/tax/simulate`      | ✅ Implemented |
 | Swagger UI / OpenAPI docs        | ✅ Implemented |
 | Spring Boot Actuator endpoints   | ✅ Implemented |
-| Docker container (WAR)           | 🔲 Planned    |
+| Docker container (WAR)           | ✅ Implemented |
 | OAuth2 / Security                | 🔲 Planned    |
 | Rate limiting / Throttling       | 🔲 Planned    |
 
