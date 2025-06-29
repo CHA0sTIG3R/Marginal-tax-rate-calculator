@@ -63,5 +63,7 @@ public class TaxDataImportService {
                 repo.save(tr);
             }
         }
+
+        entries.clear();
     }
 }
