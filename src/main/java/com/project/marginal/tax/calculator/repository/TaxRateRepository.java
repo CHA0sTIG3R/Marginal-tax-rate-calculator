@@ -14,8 +14,6 @@ package com.project.marginal.tax.calculator.repository;
 import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.entity.TaxRate;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -36,9 +34,6 @@ public interface TaxRateRepository extends JpaRepository<TaxRate, Long> {
     List<TaxRate> findByYearAndStatusAndRangeStartLessThan(
             Integer year, FilingStatus status, BigDecimal rangeStart
     );
-
-    @Query("select t from TaxRate t where t.year = :year")
-    List<TaxRate> findNoteByYear(@Param("year") Integer year);
 
     boolean existsByYear(Integer year);
 }
