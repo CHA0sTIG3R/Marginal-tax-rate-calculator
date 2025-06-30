@@ -39,6 +39,15 @@ public class TaxDataImportService {
     public void importData(InputStream in) throws CsvValidationException, IOException {
         List<BracketEntry> entries = csvUtil.importFromStream(in);
 
+        // check if entries is only one year (e.g. 2024) so we can skip grouping and check if its already in the database
+        if (entries.stream().map(BracketEntry::getYear).distinct().count() == 1) {
+            Integer year = entries.get(0).getYear();
+            if (repo.existsByYear(year)) {
+                System.out.printf("Tax rates for %d already exist, skipping import.%n", year);
+                return;
+            }
+        }
+
         Map<Integer, List<BracketEntry>> byYear = entries.stream()
                 .collect(Collectors.groupingBy(BracketEntry::getYear));
 

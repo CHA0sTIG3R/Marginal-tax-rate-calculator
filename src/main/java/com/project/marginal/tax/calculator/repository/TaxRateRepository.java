@@ -39,4 +39,6 @@ public interface TaxRateRepository extends JpaRepository<TaxRate, Long> {
 
     @Query("select t from TaxRate t where t.year = :year")
     List<TaxRate> findNoteByYear(@Param("year") Integer year);
+
+    boolean existsByYear(Integer year);
 }
