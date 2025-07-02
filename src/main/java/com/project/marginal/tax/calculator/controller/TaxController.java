@@ -40,7 +40,6 @@ public class TaxController {
     public String updateTaxRates(@RequestBody byte[] csvData) {
         try (InputStream in = new ByteArrayInputStream(csvData)) {
             importService.importData(in);
-            System.out.println("Tax rates updated successfully.");
             return "Tax rates updated successfully.";
         }
         catch (Exception e) {
