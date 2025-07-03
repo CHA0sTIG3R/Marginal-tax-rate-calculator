@@ -16,6 +16,7 @@ import com.project.marginal.tax.calculator.entity.FilingStatus;
 import com.project.marginal.tax.calculator.service.TaxDataImportService;
 import com.project.marginal.tax.calculator.service.TaxService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -37,54 +38,56 @@ public class TaxController {
             consumes = "text/csv",
             produces = "application/json"
     )
-    public String updateTaxRates(@RequestBody byte[] csvData) {
+    public ResponseEntity<String> updateTaxRates(@RequestBody byte[] csvData) {
         try (InputStream in = new ByteArrayInputStream(csvData)) {
             importService.importData(in);
-            return "Tax rates updated successfully.";
+            return ResponseEntity.ok("Tax rates updated successfully.");
         }
         catch (Exception e) {
             System.err.println("Failed to update tax rates: " + e.getMessage());
-            return "Failed to update tax rates: " + e.getMessage();
+            return ResponseEntity
+                    .badRequest()
+                    .body("Failed to update tax rates: " + e.getMessage());
         }
     }
 
 
     @GetMapping("/years")
-    public List<Integer> getYears() {
-        return service.listYears();
+    public ResponseEntity<List<Integer>> getYears() {
+        return ResponseEntity.ok(service.listYears());
     }
 
     @GetMapping("/filing-status")
-    public Map<String, String> getFilingStatus() {
-        return service.getFilingStatus();
+    public ResponseEntity<Map<String, String>> getFilingStatus() {
+        return ResponseEntity.ok(service.getFilingStatus());
     }
 
     @GetMapping("/rate")
-    public List<TaxRateDto> getRate(@RequestParam int year,
+    public ResponseEntity<List<TaxRateDto>> getRate(@RequestParam int year,
                                     @RequestParam(required = false) FilingStatus status) throws IllegalArgumentException {
-        return service.getRates(year, status);
+        return ResponseEntity.ok(service.getRates(year, status));
     }
 
     @PostMapping("/breakdown")
-    public TaxPaidResponse getTaxBreakdown(@RequestBody TaxInput taxInput) throws IllegalArgumentException {
-        return service.calculateTaxBreakdown(taxInput);
+    public ResponseEntity<TaxPaidResponse> getTaxBreakdown(@RequestBody TaxInput taxInput) throws IllegalArgumentException {
+        return ResponseEntity.ok(service.calculateTaxBreakdown(taxInput));
     }
 
     @GetMapping("/summary")
-    public TaxSummaryResponse getSummary(@RequestParam int year, @RequestParam FilingStatus status) throws IllegalArgumentException {
-        return service.getSummary(year, status);
+    public ResponseEntity<TaxSummaryResponse> getSummary(@RequestParam int year, @RequestParam FilingStatus status) throws IllegalArgumentException {
+        return ResponseEntity.ok(service.getSummary(year, status));
     }
 
     @GetMapping("/history")
-    public List<YearMetric> getHistory(@RequestParam FilingStatus status,
+    public ResponseEntity<List<YearMetric>> getHistory(@RequestParam FilingStatus status,
                                        @RequestParam(defaultValue = "TOP_RATE") Metric metric,
                                        @RequestParam(defaultValue = "1862") Integer startYear,
                                        @RequestParam(defaultValue = "2021") Integer endYear) throws IllegalArgumentException {
-        return service.getHistory(status, metric, startYear, endYear);
+        return ResponseEntity.ok(service.getHistory(status, metric, startYear, endYear));
     }
 
     @PostMapping("/simulate")
-    public List<TaxPaidResponse> simulate(@RequestBody List<TaxInput> taxInputs) throws IllegalArgumentException {
-        return service.simulateBulk(taxInputs);
+    public ResponseEntity<List<TaxPaidResponse>> simulate(@RequestBody List<TaxInput> taxInputs) throws IllegalArgumentException {
+        return ResponseEntity.ok(service.simulateBulk(taxInputs));
     }
 }
