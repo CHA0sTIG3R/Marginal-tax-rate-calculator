@@ -31,8 +31,8 @@ import static com.project.marginal.tax.calculator.utility.NumberFormatUtils.perc
 @RequiredArgsConstructor
 public class TaxService {
 
-    int MIN_YEAR = 1862;
-    int MAX_YEAR = Year.now().getValue() - 1;
+    final int MIN_YEAR = 1862;
+    final int MAX_YEAR = Year.now().getValue() - 1;
 
     private final TaxRateRepository taxRateRepo;
     private final NoIncomeTaxYearRepository noTaxRepo;
