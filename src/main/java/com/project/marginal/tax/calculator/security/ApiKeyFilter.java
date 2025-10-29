@@ -14,13 +14,18 @@ import java.io.IOException;
 @Component
 public class ApiKeyFilter extends OncePerRequestFilter {
 
-    @Value("${app.ingest.api-key}")
+    @Value("${app.ingest.api-key:}")
     private String expectedApiKey;
 
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
             throws ServletException, IOException {
         if ("/api/v1/tax/upload".equals(request.getRequestURI())) {
+            if (expectedApiKey == null || expectedApiKey.isBlank()) {
+                System.out.println("🔑 API key not configured; rejecting upload");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
             String apiKey = request.getHeader("X-API-KEY");
             if (apiKey == null || !apiKey.equals(expectedApiKey)) {
                 System.out.println("🔑 Invalid or missing API Key");

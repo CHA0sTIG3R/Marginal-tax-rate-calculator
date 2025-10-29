@@ -35,15 +35,20 @@ public class TaxDataBootstrapper implements CommandLineRunner {
     @Value("${tax.import-on-startup:false}")
     private boolean importOnStartup;
 
-    @Value("${tax.s3-bucket}")
+    @Value("${tax.s3-bucket:}")
     private String s3Bucket;
 
-    @Value("${tax.s3-key}")
+    @Value("${tax.s3-key:}")
     private String s3Key;
 
     @Override
     public void run(String... args) {
         if (!importOnStartup || repo.count() > 0) return;
+
+        if (s3Bucket == null || s3Bucket.isBlank() || s3Key == null || s3Key.isBlank()) {
+            System.out.println("⚠ tax.import-on-startup enabled but S3 bucket/key not configured; skipping import.");
+            return;
+        }
 
         System.out.printf("📦 Fetching tax data from s3://%s/%s%n", s3Bucket, s3Key);
 
