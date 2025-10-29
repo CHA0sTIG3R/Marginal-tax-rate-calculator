@@ -89,33 +89,34 @@ Service listens on port **8080**.
 
 ## Configuration
 
-Edit `src/main/resources/application.properties` (or use `application.yml`):
+This project ships a tracked `src/main/resources/application.properties` that contains no secrets and defers to environment variables. Configure via `.env`, environment vars, or by overriding the properties file.
+
+Recommended: copy `.env.example` to `.env` and set real values.
+
+Key settings and env mappings:
 
 ```properties
-# App name
-spring.application.name=Marginal-tax-rate-calculator
+# JPA schema management
+spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
 
-# JPA schema management: create-drop, validate, update
-spring.jpa.hibernate.ddl-auto=update
+# Ingestion API key for /api/v1/tax/upload (required to enable uploads)
+app.ingest.api-key=${APP_INGEST_API_KEY:}
 
-# CSV import on startup (requires empty DB)
-tax.import-on-startup=true
-# S3 source for historical CSV
-tax.s3-bucket=YOUR_BUCKET_NAME
-tax.s3-key=path/to/history.csv
+# Data import (profile: data-import)
+tax.import-on-startup=${TAX_IMPORT_ON_STARTUP:false}
+tax.s3-bucket=${TAX_S3_BUCKET:}
+tax.s3-key=${TAX_S3_KEY:}
 
-# Ingestion API key for upload (not yet enforced)
-app.ingest.api-key=YOUR_SECURE_KEY
-
-# Database connection (PostgreSQL example)
-spring.datasource.url=jdbc:postgresql://localhost:5432/taxdb
-spring.datasource.username=postgres
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# CORS (optional)
-# cors.allowed-origins=http://localhost:3000
+# Database (PostgreSQL example)
+spring.datasource.url=${SPRING_DATASOURCE_URL:}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}
+spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER:}
 ```
+
+Notes:
+- When `APP_INGEST_API_KEY` is unset or empty, uploads to `/api/v1/tax/upload` are rejected (401), but the app still starts.
+- For Docker Compose, variables in `.env` are loaded automatically (see `env_file: .env`).
 
 ---
 
