@@ -27,4 +27,8 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .maxAge(3600);
     }
+
+    // TODO: Add a RequestLoggingFilter bean that logs method, path, status, duration,
+    //  remote IP and User-Agent with a correlation id (rid). Ensure sensitive headers
+    //  like X-API-KEY are redacted. See also application.properties logging TODOs.
 }

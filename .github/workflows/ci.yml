@@ -1,3 +1,7 @@
+# TODO: Add a separate deploy workflow (deploy.yml) that:
+#  - Builds the Docker image and pushes to ECR (login via OIDC)
+#  - Triggers EC2 deployment via SSM (docker compose pull/up)
+#  Keep this ci.yml focused on build & test only.
 name: CI
 
 on:

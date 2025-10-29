@@ -17,6 +17,10 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     @Value("${app.ingest.api-key:}")
     private String expectedApiKey;
 
+    // TODO: Replace System.out prints with structured logging (SLF4J logger).
+    //  Avoid logging sensitive headers. If request logging is added globally,
+    //  ensure the X-API-KEY header is masked/redacted.
+
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
             throws ServletException, IOException {

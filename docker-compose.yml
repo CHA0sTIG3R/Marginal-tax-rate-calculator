@@ -1,5 +1,7 @@
 services:
   tax_data:
+    # TODO: Replace local image with ECR image reference after CI pushes it, e.g.:
+    # image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/marginal-tax-rate-calculator:latest
     image: tax_data_service:latest
     build:
       context: .
@@ -10,3 +12,5 @@ services:
 
     ports:
       - "8080:8080"
+    # TODO: On EC2, remove the build section above and rely on "image:" from ECR,
+    # then run: docker compose pull && docker compose up -d
