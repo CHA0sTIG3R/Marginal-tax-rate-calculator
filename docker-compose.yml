@@ -1,6 +1,6 @@
 services:
   tax_data:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/tax-api:prod
+    image: 300536313917.dkr.ecr.us-east-1.amazonaws.com/tax-api:prod
     pull_policy: always
 
     env_file:
