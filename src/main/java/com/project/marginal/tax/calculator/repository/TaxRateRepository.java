@@ -36,4 +36,6 @@ public interface TaxRateRepository extends JpaRepository<TaxRate, Long> {
     );
 
     void deleteByYear(Integer year);
+
+    boolean existsByYear(Integer year);
 }

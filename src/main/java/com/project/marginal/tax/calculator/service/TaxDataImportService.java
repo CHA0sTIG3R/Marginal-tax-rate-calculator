@@ -53,6 +53,12 @@ public class TaxDataImportService {
             Integer year = e.getKey();
             List<BracketEntry> yearEntries = e.getValue();
 
+            // Idempotency: if data for this year already exists, skip importing this year
+            if (repo.existsByYear(year)) {
+                System.out.printf("Tax rates for %d already exist, skipping import for this year.%n", year);
+                continue;
+            }
+
             if (yearEntries.size() == FilingStatus.values().length
                     && yearEntries.stream().allMatch(x -> x.getRate() == 0)) {
                 noTaxRepo.save(new NoIncomeTaxYear(year));
