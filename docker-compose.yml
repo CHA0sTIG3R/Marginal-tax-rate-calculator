@@ -1,8 +1,6 @@
 services:
   tax_data:
-    # TODO: Replace local image with ECR image reference after CI pushes it, e.g.:
-    # image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/marginal-tax-rate-calculator:latest
-    image: tax_data_service:latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/marginal-tax-rate-calculator:latest
     build:
       context: .
       dockerfile: Dockerfile
