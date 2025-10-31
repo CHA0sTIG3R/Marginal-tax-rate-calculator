@@ -1,6 +1,6 @@
 services:
   tax_data:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/marginal-tax-rate-calculator:latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/tax-api:prod
     pull_policy: always
 
     env_file:

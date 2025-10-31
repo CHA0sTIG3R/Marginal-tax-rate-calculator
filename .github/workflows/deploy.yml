@@ -55,24 +55,18 @@ jobs:
           docker push "$ECR_URI:prod"
           echo "IMAGE_URI=$ECR_URI:$GIT_SHA" >> "$GITHUB_ENV"
 
-      # TODO: One-off data import job (idempotent and safe to re-run)
-      # - Recommended: trigger a one-time import using the same image with the
-      #   data-import profile. The import code should guard itself via a DB marker
-      #   (e.g., data_import_lock) so this step can run on every deploy without
-      #   re-importing after the first success.
-      # - Example via SSM on the EC2 host that runs docker compose:
-      # - name: (Example) Run one-off data import on EC2
-      #   shell: bash
-      #   run: |
-      #     set -euo pipefail
-      #     : "${APP_DIR:=/home/ubuntu/app}"
-      #     aws ssm send-command \
-      #       --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
-      #       --document-name "AWS-RunShellScript" \
-      #       --comment "Run data-import once (idempotent)" \
-      #       --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","SPRING_PROFILES_ACTIVE=data-import docker compose run --rm app"]}' \
-      #       --region "$AWS_REGION" \
-      #       --output text
+      - name: Run one-off data import on EC2
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${APP_DIR:=/home/ubuntu/app}"
+          aws ssm send-command \
+            --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Run data-import once (idempotent)" \
+            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","docker compose run --rm -e SPRING_PROFILES_ACTIVE=data-import tax_data"]}' \
+            --region "$AWS_REGION" \
+            --output text
 
       - name: Deploy on EC2 via SSM
         shell: bash
