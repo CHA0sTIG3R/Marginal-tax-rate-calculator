@@ -15,9 +15,11 @@ import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import com.project.marginal.tax.calculator.service.TaxDataImportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
@@ -26,11 +28,12 @@ import java.io.InputStream;
 @Component
 @Profile("data-import")
 @RequiredArgsConstructor
-public class TaxDataBootstrapper implements CommandLineRunner {
+public class TaxDataBootstrapper implements ApplicationRunner {
 
     private final TaxDataImportService importer;
     private final TaxRateRepository repo;
     private final S3Client s3Client;
+    private final JdbcTemplate jdbcTemplate;
 
     @Value("${tax.import-on-startup:false}")
     private boolean importOnStartup;
@@ -42,8 +45,18 @@ public class TaxDataBootstrapper implements CommandLineRunner {
     private String s3Key;
 
     @Override
-    public void run(String... args) {
-        if (!importOnStartup || repo.count() > 0) return;
+    public void run(ApplicationArguments args) {
+        if (!importOnStartup) return;
+
+        // 1) Try atomic insert into marker table (id=1). If row not inserted, another import already happened.
+        int affected = jdbcTemplate.update(
+                "INSERT INTO data_import_lock (id, completed_at) VALUES (1, NULL) ON CONFLICT (id) DO NOTHING"
+        );
+
+        if (affected == 0) {
+            System.out.println("ℹ Data import lock already present; skipping import.");
+            return;
+        }
 
         if (s3Bucket == null || s3Bucket.isBlank() || s3Key == null || s3Key.isBlank()) {
             System.out.println("⚠ tax.import-on-startup enabled but S3 bucket/key not configured; skipping import.");
@@ -59,11 +72,12 @@ public class TaxDataBootstrapper implements CommandLineRunner {
                         .build())) {
             importer.importData(in);
             System.out.println("✔ Tax rates imported from remote CSV.");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("✘ Failed to import tax rates: " + e.getMessage());
-        }
-        finally {
+            throw new RuntimeException(e);
+        } finally {
+            // 3) Update completed_at regardless; if import failed above and process crashes, next run will try again
+            jdbcTemplate.update("UPDATE data_import_lock SET completed_at = NOW() WHERE id = 1");
             System.out.println("✔ Tax rates import process completed.");
         }
     }
