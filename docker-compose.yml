@@ -1,14 +1,10 @@
 services:
   tax_data:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/marginal-tax-rate-calculator:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+    pull_policy: always
 
     env_file:
       - .env
 
     ports:
       - "8080:8080"
-    # TODO: On EC2, remove the build section above and rely on "image:" from ECR,
-    # then run: docker compose pull && docker compose up -d
