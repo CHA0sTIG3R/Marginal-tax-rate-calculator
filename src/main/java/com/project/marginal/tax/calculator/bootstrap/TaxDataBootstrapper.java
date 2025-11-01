@@ -47,6 +47,8 @@ public class TaxDataBootstrapper implements ApplicationRunner {
     private String s3Key;
 
     private static final Logger log = LoggerFactory.getLogger(TaxDataBootstrapper.class);
+    @Value("${APP_DB_SCHEMA:${SPRING_FLYWAY_DEFAULT_SCHEMA:flyway_schema}}")
+    private String dbSchema;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -54,7 +56,7 @@ public class TaxDataBootstrapper implements ApplicationRunner {
 
         // 1) Try atomic insert into marker table (id=1). If row not inserted, another import already happened.
         int affected = jdbcTemplate.update(
-                "INSERT INTO data_import_lock (id, completed_at) VALUES (1, NULL) ON CONFLICT (id) DO NOTHING"
+                "INSERT INTO " + dbSchema + ".data_import_lock (id, completed_at) VALUES (1, NULL) ON CONFLICT (id) DO NOTHING"
         );
 
         if (affected == 0) {
@@ -81,7 +83,7 @@ public class TaxDataBootstrapper implements ApplicationRunner {
             throw new RuntimeException(e);
         } finally {
             // 3) Update completed_at regardless; if import failed above and process crashes, next run will try again
-            jdbcTemplate.update("UPDATE data_import_lock SET completed_at = NOW() WHERE id = 1");
+            jdbcTemplate.update("UPDATE " + dbSchema + ".data_import_lock SET completed_at = NOW() WHERE id = 1");
             log.info("Tax rates import process completed.");
         }
     }
