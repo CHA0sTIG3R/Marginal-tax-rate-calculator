@@ -8,3 +8,9 @@ services:
 
     ports:
       - "8080:8080"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${CLOUDWATCH_LOG_GROUP:-/ec2/tax-api}
+        awslogs-stream: ${CLOUDWATCH_LOG_STREAM:-tax-api}
