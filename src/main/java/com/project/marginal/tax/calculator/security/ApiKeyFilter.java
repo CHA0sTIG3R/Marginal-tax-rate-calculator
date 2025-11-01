@@ -23,6 +23,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
             throws ServletException, IOException {
+        // TODO: If a servlet context path is introduced, consider using AntPathMatcher
+        //  or startsWith to ensure the filter still protects the upload endpoint.
         if ("/api/v1/tax/upload".equals(request.getRequestURI())) {
             if (expectedApiKey == null || expectedApiKey.isBlank()) {
                 log.error("API key not configured; rejecting upload uri={} clientIp={}",
