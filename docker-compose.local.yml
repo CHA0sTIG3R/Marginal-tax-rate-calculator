@@ -1,0 +1,46 @@
+services:
+  tax_data:
+    image: tax-api:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Override prod logging to local json-file driver
+    logging:
+      driver: local
+    # Do not read base .env to avoid localhost URLs bleeding in
+    env_file: []
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/local_tax_db?sslmode=disable
+      SPRING_DATASOURCE_USERNAME: dev
+      SPRING_DATASOURCE_PASSWORD: devdb
+      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+      # Rely on Flyway across environments (no Hibernate DDL)
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      # Align schema settings for local DB
+      APP_DB_SCHEMA: flyway_schema
+      SPRING_FLYWAY_SCHEMAS: flyway_schema
+      SPRING_FLYWAY_DEFAULT_SCHEMA: flyway_schema
+      # Keep data-import profile but skip actual import unless you set it true
+      TAX_IMPORT_ON_STARTUP: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17.4
+    environment:
+      POSTGRES_DB: local_tax_db
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d local_tax_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
