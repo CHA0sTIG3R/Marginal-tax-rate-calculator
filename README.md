@@ -85,38 +85,28 @@ mvn spring-boot:run
 
 Service listens on port **8080**.
 
+### Local with Docker (app + DB)
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+```
+
+Logs: `docker compose logs -f` (local driver). App: http://localhost:8080/swagger-ui/index.html
+
 ---
 
 ## Configuration
 
-This project ships a tracked `src/main/resources/application.properties` that contains no secrets and defers to environment variables. Configure via `.env`, environment vars, or by overriding the properties file.
+- application.properties is env-first and contains no secrets.
+- Copy `.env.example` → `.env` (for Compose) and set real values.
 
-Recommended: copy `.env.example` to `.env` and set real values.
+Key env vars:
+- Datasource: `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
+- API key: `APP_INGEST_API_KEY` (protects `/api/v1/tax/upload`)
+- Import: `TAX_IMPORT_ON_STARTUP`, `TAX_S3_BUCKET`, `TAX_S3_KEY`, `AWS_REGION` or `tax.s3-region`
+- Schemas: `SPRING_FLYWAY_SCHEMAS`, `SPRING_FLYWAY_DEFAULT_SCHEMA`, `APP_DB_SCHEMA`
 
-Key settings and env mappings:
-
-```properties
-# JPA schema management
-spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
-
-# Ingestion API key for /api/v1/tax/upload (required to enable uploads)
-app.ingest.api-key=${APP_INGEST_API_KEY:}
-
-# Data import (profile: data-import)
-tax.import-on-startup=${TAX_IMPORT_ON_STARTUP:false}
-tax.s3-bucket=${TAX_S3_BUCKET:}
-tax.s3-key=${TAX_S3_KEY:}
-
-# Database (PostgreSQL example)
-spring.datasource.url=${SPRING_DATASOURCE_URL:}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME:}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}
-spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER:}
-```
-
-Notes:
-- When `APP_INGEST_API_KEY` is unset or empty, uploads to `/api/v1/tax/upload` are rejected (401), but the app still starts.
-- For Docker Compose, variables in `.env` are loaded automatically (see `env_file: .env`).
+Local Docker override: see `docker-compose.local.yml` to build locally and run with a local Postgres (no CloudWatch logging).
 
 ---
 
@@ -177,9 +167,10 @@ src/main/java/com/project/marginal/tax/calculator
 
 ## Continuous Integration
 
-GitHub Actions (`.github/workflows/ci.yml`) runs:
-
-* Build & test on Java 17
+GitHub Actions:
+- `.github/workflows/ci.yml`: build & test on Java 17
+- `.github/workflows/deploy.yml`: build image → push to ECR → deploy to EC2 via SSM
+- Skip CI on a push: include `[skip ci]` in the commit message
 
 ## Contributing
 
