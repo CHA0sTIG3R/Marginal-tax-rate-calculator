@@ -57,6 +57,9 @@ jobs:
           echo "ECR_URI=$ECR_URI" >> "$GITHUB_ENV"
           echo "ECR_REGISTRY=${ECR_URI%/*}" >> "$GITHUB_ENV"
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push image to ECR
         uses: docker/build-push-action@v6
         with:
