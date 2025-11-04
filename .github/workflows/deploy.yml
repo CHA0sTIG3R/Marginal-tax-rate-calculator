@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write   
+      id-token: write   # for OIDC
       contents: read
     env:
       AWS_REGION: us-east-1
