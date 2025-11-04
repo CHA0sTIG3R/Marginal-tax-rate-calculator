@@ -58,17 +58,19 @@ jobs:
           echo "ECR_REGISTRY=${ECR_URI%/*}" >> "$GITHUB_ENV"
 
       - name: Build and push image to ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          provenance: false
+          push: true
+          tags: |
+            ${{ steps.ecr.outputs.repositoryUri }}:${{ github.sha }}
+            ${{ steps.ecr.outputs.repositoryUri }}:prod
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
         env:
-          ECR_URI: ${{ steps.ecr.outputs.repositoryUri }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          GIT_SHA=${GITHUB_SHA::7}
-          aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "${ECR_URI%/*}"
-          docker build --platform linux/amd64 --provenance=false -t "$ECR_URI:$GIT_SHA" -t "$ECR_URI:prod" .
-          docker push "$ECR_URI:$GIT_SHA"
-          docker push "$ECR_URI:prod"
-          echo "IMAGE_URI=$ECR_URI:$GIT_SHA" >> "$GITHUB_ENV"
+          AWS_REGION: ${{ env.AWS_REGION }}
 
       - name: Run one-off data import on EC2
         shell: bash
@@ -90,6 +92,6 @@ jobs:
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy tax-api" \
-            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","docker compose pull","docker compose up -d"]}' \
+            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","pwd","ls -la","docker compose version","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","docker compose pull","docker compose up -d --force-recreate","docker compose ps"]}' \
             --region "$AWS_REGION" \
             --output text
