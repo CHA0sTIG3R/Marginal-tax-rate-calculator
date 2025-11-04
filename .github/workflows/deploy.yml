@@ -1,5 +1,4 @@
 name: Deploy
-# TODO: Set APP_DIR to the directory on EC2 that contains docker-compose.yml (e.g., /home/ec2-user/tax-api).
 # TODO: Confirm ECR_REPO name matches the repository you created.
 
 on:
@@ -16,6 +15,7 @@ jobs:
     env:
       AWS_REGION: us-east-1
       ECR_REPO: tax-api
+      APP_DIR: /home/ec2-user/tax-api
       TARGET_TAG_KEY: Service
       TARGET_TAG_VALUE: tax-api
     steps:
@@ -76,8 +76,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          : "${APP_DIR:=/home/ec2-user/tax-api}"
-          # TODO: Adjust APP_DIR to your compose folder path.
           aws ssm send-command \
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
             --document-name "AWS-RunShellScript" \
@@ -90,8 +88,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          : "${APP_DIR:=/home/ec2-user/tax-api}"
-          # TODO: Adjust APP_DIR to your compose folder path.
           aws ssm send-command \
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
             --document-name "AWS-RunShellScript" \
