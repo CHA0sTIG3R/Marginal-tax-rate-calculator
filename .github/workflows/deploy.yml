@@ -136,20 +136,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          set -x
           CMD_ID=$(aws ssm send-command \
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
             --document-name "AWS-RunShellScript" \
             --comment "Run data-import once (idempotent)" \
             --timeout-seconds 1200 \
-            --parameters \
-              commands="set -e",\
-              "cd ${APP_DIR}",\
-              "pwd",\
-              "ls -la",\
-              "docker compose version",\
-              "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}",\
-              "timeout 900 docker compose run --rm -e SPRING_PROFILES_ACTIVE=data-import -e TAX_IMPORT_ON_STARTUP=true -e SPRING_MAIN_WEB_APPLICATION_TYPE=none tax_data" \
+            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","pwd","ls -la","docker compose version","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","timeout 900 docker compose run --rm -e SPRING_PROFILES_ACTIVE=data-import -e TAX_IMPORT_ON_STARTUP=true -e SPRING_MAIN_WEB_APPLICATION_TYPE=none tax_data"]}' \
             --region "$AWS_REGION" \
             --query 'Command.CommandId' --output text)
           echo "Import CommandId: $CMD_ID"
@@ -169,25 +161,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          set -x
           aws ssm send-command \
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy tax-api" \
             --timeout-seconds 1200 \
-            --parameters \
-              commands="set -e",\
-              "cd ${APP_DIR}",\
-              "pwd",\
-              "ls -la",\
-              "docker compose version",\
-              "test -f docker-compose.yml || (echo docker-compose.yml not found in $(pwd); ls -la; exit 1)",\
-              "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}",\
-              "docker compose pull",\
-              "docker compose up -d --force-recreate",\
-              "docker compose ps",\
-              "echo Waiting for app health...",\
-              "bash -lc 'STATUS=failed; for i in $(seq 1 60); do if curl -sf http://127.0.0.1:8080/actuator/health >/dev/null; then STATUS=ok; break; fi; sleep 5; done; if [ \"$STATUS\" != \"ok\" ]; then echo Health check failed; docker compose ps; docker compose logs --no-log-prefix --since 10m || true; exit 1; fi'",\
-              "echo App is healthy" \
+            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","pwd","ls -la","docker compose version","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","docker compose pull","docker compose up -d --force-recreate","docker compose ps"]}' \
             --region "$AWS_REGION" \
             --output text
