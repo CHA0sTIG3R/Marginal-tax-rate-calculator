@@ -14,7 +14,6 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -B -q -T 1C -DskipTests clean package
 
 FROM eclipse-temurin:17-jre-alpine
-ENV SPRING_PROFILES_ACTIVE=data-import
 
 COPY --from=builder /workspace/target/*.war  /Marginal-tax-rate-calculator-0.0.1-SNAPSHOT.war
 
