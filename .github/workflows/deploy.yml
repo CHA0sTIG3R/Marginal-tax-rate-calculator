@@ -65,10 +65,17 @@ jobs:
           set -euo pipefail
           GIT_SHA=${GITHUB_SHA::7}
           aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "${ECR_URI%/*}"
-          # TODO: Optionally add build cache and versioned tags (e.g., :latest, :prod, :$GIT_SHA)
-          docker build --platform linux/amd64 --provenance=false -t "$ECR_URI:$GIT_SHA" -t "$ECR_URI:prod" .
-          docker push "$ECR_URI:$GIT_SHA"
-          docker push "$ECR_URI:prod"
+          # Build with cache and versioned tags, push directly
+          # Uses registry cache at $ECR_URI:buildcache for speed
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --cache-from type=registry,ref="$ECR_URI:buildcache" \
+            --cache-to type=registry,ref="$ECR_URI:buildcache",mode=max \
+            -t "$ECR_URI:$GIT_SHA" \
+            -t "$ECR_URI:prod" \
+            -t "$ECR_URI:latest" \
+            --push .
           echo "IMAGE_URI=$ECR_URI:$GIT_SHA" >> "$GITHUB_ENV"
 
       - name: Run one-off data import on EC2
