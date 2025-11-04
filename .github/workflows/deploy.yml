@@ -166,6 +166,20 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "Deploy tax-api" \
             --timeout-seconds 1200 \
-            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","pwd","ls -la","docker compose version","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","docker compose pull","docker compose up -d --force-recreate","docker compose ps","curl -sf http://127.0.0.1:8080/actuator/health || (docker compose logs --no-log-prefix --since 10m && exit 1)"]}' \
+            --parameters '{"commands":[
+              "set -e",
+              "cd '"${APP_DIR}"'",
+              "pwd",
+              "ls -la",
+              "docker compose version",
+              "test -f docker-compose.yml || (echo 'docker-compose.yml not found in '$(pwd); ls -la; exit 1)",
+              "aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'",
+              "docker compose pull",
+              "docker compose up -d --force-recreate",
+              "docker compose ps",
+              "echo 'Waiting for app health...'",
+              "STATUS=failed; for i in $(seq 1 60); do if curl -sf http://127.0.0.1:8080/actuator/health >/dev/null; then STATUS=ok; break; fi; sleep 5; done; if [ \"$STATUS\" != \"ok\" ]; then echo 'Health check failed'; docker compose ps; docker compose logs --no-log-prefix --since 10m || true; exit 1; fi",
+              "echo 'App is healthy'"
+            ]}' \
             --region "$AWS_REGION" \
             --output text
