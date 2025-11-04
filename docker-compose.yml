@@ -12,4 +12,3 @@ services:
       driver: awslogs
       options:
         awslogs-region: ${AWS_REGION}
-        awslogs-group: ${CLOUDWATCH_LOG_GROUP:-/aws/ec2/tax-api}

@@ -85,6 +85,6 @@ public class TaxDataBootstrapper implements ApplicationRunner {
             // 3) Update completed_at regardless; if import failed above and process crashes, next run will try again
             jdbcTemplate.update("UPDATE " + dbSchema + ".data_import_lock SET completed_at = NOW() WHERE id = 1");
             log.info("Tax rates import process completed.");
-        }
+        } 
     }
 }
