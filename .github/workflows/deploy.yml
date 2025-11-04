@@ -1,5 +1,4 @@
 name: Deploy
-# TODO: Ensure EC2 instance(s) are tagged with: Service=tax-api (or adjust TARGET_TAG_* below).
 # TODO: Set APP_DIR to the directory on EC2 that contains docker-compose.yml (e.g., /home/ec2-user/tax-api).
 # TODO: Confirm ECR_REPO name matches the repository you created.
 
@@ -28,6 +27,20 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::300536313917:role/GitHubOIDCRole
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify EC2 tag targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          COUNT=$(aws ec2 describe-instances \
+            --filters "Name=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" "Name=instance-state-name,Values=running" \
+            --query "Reservations[].Instances[].InstanceId" --output text | wc -w)
+          if [ "${COUNT}" -eq 0 ]; then
+            echo "No running EC2 instances found with tag ${TARGET_TAG_KEY}=${TARGET_TAG_VALUE} in ${AWS_REGION}." >&2
+            echo "Tag your instance(s) or adjust TARGET_TAG_* in the workflow env." >&2
+            exit 1
+          fi
+          echo "Found ${COUNT} running instance(s) with tag ${TARGET_TAG_KEY}=${TARGET_TAG_VALUE}."
 
       - name: Ensure ECR repo exists
         id: ecr
