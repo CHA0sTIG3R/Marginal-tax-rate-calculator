@@ -80,7 +80,7 @@ public class CorsConfig implements WebMvcConfigurer {
                         log.info("rid={} method={} path={} status={} duration_ms={} ip={} ua={}",
                                 rid, method, path, status, durationMs, ip, ua);
                     }
-                    MDC.remove("rid");
+                    MDC.remove("rid"); 
                 }
             }
 
