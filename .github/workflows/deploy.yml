@@ -4,13 +4,22 @@ on:
   workflow_run:
     workflows: ["CI"]
     types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_import:
+        description: "Run one-off data import before deploy"
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   deploy:
-    # Run only when CI succeeded on main
+    # Run when CI succeeded on default branch, or when manually triggered
     if: >-
-      ${{ github.event.workflow_run.conclusion == 'success' &&
-          github.event.workflow_run.head_branch == 'master' }}
+      ${{ (github.event_name == 'workflow_run' &&
+            github.event.workflow_run.conclusion == 'success' &&
+            github.event.workflow_run.head_branch == 'master') ||
+           (github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write   # for OIDC
@@ -25,7 +34,7 @@ jobs:
       - name: Checkout tested commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 0
 
       - name: Configure AWS credentials (OIDC)
@@ -71,18 +80,30 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Decide whether to run data import
+        id: import
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.run_import }}" = "true" ]; then
+            echo "run_import=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_import=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Determine if image-relevant files changed
         id: changes
         shell: bash
         run: |
           set -euo pipefail
-          BASE_SHA=$(git rev-parse "${{ github.event.workflow_run.head_sha }}^" 2>/dev/null || true)
+          HEAD_SHA=${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          BASE_SHA=$(git rev-parse "${HEAD_SHA}^" 2>/dev/null || true)
           if [ -z "$BASE_SHA" ]; then
             echo "No base commit; building by default." >&2
             echo "should_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          CHANGED=$(git diff --name-only "$BASE_SHA" "${{ github.event.workflow_run.head_sha }}")
+          CHANGED=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
           echo "$CHANGED" >&2
           if echo "$CHANGED" | grep -E '^(Dockerfile|\\.dockerignore|pom\\.xml|src/|docker-compose\\.yml)'; then
             echo "should_build=true" >> "$GITHUB_OUTPUT"
@@ -99,30 +120,44 @@ jobs:
           provenance: false
           push: true
           tags: |
-            ${{ steps.ecr.outputs.repositoryUri }}:${{ github.event.workflow_run.head_sha }}
+            ${{ steps.ecr.outputs.repositoryUri }}:${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
             ${{ steps.ecr.outputs.repositoryUri }}:prod
           cache-from: type=gha
           cache-to: type=gha,mode=max
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
 
-      - name: Skip build/deploy (no relevant changes)
+      - name: Skip build (no relevant changes)
         if: steps.changes.outputs.should_build != 'true'
-        run: echo "No Docker/app changes detected. Skipping build and deploy."
+        run: echo "No Docker/app changes detected. Skipping image build."
 
-      - name: Run one-off data import on EC2 (always)
+      - name: Run one-off data import on EC2 (when requested)
+        if: steps.import.outputs.run_import == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          aws ssm send-command \
+          CMD_ID=$(aws ssm send-command \
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
             --document-name "AWS-RunShellScript" \
             --comment "Run data-import once (idempotent)" \
-            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","docker compose run --rm -e SPRING_PROFILES_ACTIVE=data-import tax_data"]}' \
+            --timeout-seconds 1200 \
+            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","pwd","ls -la","docker compose version","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","timeout 900 docker compose run --rm -e SPRING_PROFILES_ACTIVE=data-import -e TAX_IMPORT_ON_STARTUP=true -e SPRING_MAIN_WEB_APPLICATION_TYPE=none tax_data"]}' \
             --region "$AWS_REGION" \
-            --output text
+            --query 'Command.CommandId' --output text)
+          echo "Import CommandId: $CMD_ID"
+          # Poll until import completes on all targets
+          for i in $(seq 1 120); do
+            STATUS=$(aws ssm list-command-invocations --command-id "$CMD_ID" --details --query 'CommandInvocations[].Status' --output text)
+            echo "Import status: $STATUS"
+            if echo "$STATUS" | grep -qE 'Success'; then exit 0; fi
+            if echo "$STATUS" | grep -qE 'Failed|Cancelled|TimedOut'; then echo "Import failed with status: $STATUS" >&2; exit 1; fi
+            sleep 5
+          done
+          echo "Import timed out waiting for completion" >&2
+          exit 1
 
-      - name: Deploy on EC2 via SSM (always)
+      - name: Deploy on EC2 via SSM
+        if: steps.changes.outputs.should_build == 'true' || steps.import.outputs.run_import == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -130,6 +165,7 @@ jobs:
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy tax-api" \
-            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","pwd","ls -la","docker compose version","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","docker compose pull","docker compose up -d --force-recreate","docker compose ps"]}' \
+            --timeout-seconds 1200 \
+            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","pwd","ls -la","docker compose version","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","docker compose pull","docker compose up -d --force-recreate","docker compose ps","curl -sf http://127.0.0.1:8080/actuator/health || (docker compose logs --no-log-prefix --since 10m && exit 1)"]}' \
             --region "$AWS_REGION" \
             --output text
