@@ -1,6 +1,6 @@
 name: Deploy
 # TODO: Ensure EC2 instance(s) are tagged with: Service=tax-api (or adjust TARGET_TAG_* below).
-# TODO: Set APP_DIR to the directory on EC2 that contains docker-compose.yml (e.g., /home/ec2-user/Marginal-tax-rate-calculator).
+# TODO: Set APP_DIR to the directory on EC2 that contains docker-compose.yml (e.g., /home/ec2-user/tax-api).
 # TODO: Confirm ECR_REPO name matches the repository you created.
 
 on:
@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          : "${APP_DIR:=/home/ec2-user/Marginal-tax-rate-calculator}"
+          : "${APP_DIR:=/home/ec2-user/tax-api}"
           # TODO: Adjust APP_DIR to your compose folder path.
           aws ssm send-command \
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
@@ -77,7 +77,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          : "${APP_DIR:=/home/ec2-user/Marginal-tax-rate-calculator}"
+          : "${APP_DIR:=/home/ec2-user/tax-api}"
           # TODO: Adjust APP_DIR to your compose folder path.
           aws ssm send-command \
             --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
