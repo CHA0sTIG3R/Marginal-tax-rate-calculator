@@ -1,5 +1,4 @@
 name: Deploy
-# TODO: Confirm ECR_REPO name matches the repository you created.
 
 on:
   workflow_dispatch:
