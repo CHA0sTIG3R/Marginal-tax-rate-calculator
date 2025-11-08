@@ -20,6 +20,7 @@ import com.project.marginal.tax.calculator.repository.NoIncomeTaxYearRepository;
 import com.project.marginal.tax.calculator.repository.TaxRateRepository;
 import com.project.marginal.tax.calculator.utility.CsvImportUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -56,7 +57,11 @@ public class TaxDataImportService {
 
             if (yearEntries.size() == FilingStatus.values().length
                     && yearEntries.stream().allMatch(x -> x.getRate() == 0)) {
-                noTaxRepo.save(new NoIncomeTaxYear(year));
+                try {
+                    noTaxRepo.save(new NoIncomeTaxYear(year));
+                } catch (DataIntegrityViolationException e1) {
+                    System.out.printf("NoIncomeTaxYear %d already present; skipping.%n", year);
+                }
                 continue;
             }
 
@@ -68,7 +73,14 @@ public class TaxDataImportService {
                         entry.getRangeStart(),
                         entry.getRangeEnd()
                 );
-                repo.save(tr);
+                try {
+                    repo.save(tr);
+                } catch (DataIntegrityViolationException e2) {
+                    System.out.printf(
+                            "Duplicate bracket detected; skipping year=%d status=%s start=%s end=%s%n",
+                            entry.getYear(), entry.getStatus(), entry.getRangeStart(), entry.getRangeEnd()
+                    );
+                }
             }
         }
 
