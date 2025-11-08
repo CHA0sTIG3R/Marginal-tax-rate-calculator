@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
-@Profile("data-import")
+@ConditionalOnProperty(prefix = "tax.s3-import", name = "enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class S3ImportPoller {
     private static final Logger log = LoggerFactory.getLogger(S3ImportPoller.class);
@@ -33,8 +33,8 @@ public class S3ImportPoller {
     @Value("${tax.s3-key:}")
     private String s3Key;
 
-    // Poll every 15 minutes by default; override with env TAX_S3_POLL_MS
-    @Scheduled(fixedDelayString = "${tax.s3-poll-ms:900000}")
+    // Use cron expression if provided, else every 15 minutes by default
+    @Scheduled(cron = "${tax.s3-import.cron:0 */15 * * * *}")
     public void poll() {
         if (s3Bucket == null || s3Bucket.isBlank() || s3Key == null || s3Key.isBlank()) {
             return;
@@ -69,4 +69,3 @@ public class S3ImportPoller {
         }
     }
 }
-
