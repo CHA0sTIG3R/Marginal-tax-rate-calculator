@@ -39,12 +39,7 @@ public class TaxDataImportService {
     public void importData(InputStream in) throws CsvValidationException, IOException {
         List<BracketEntry> entries = csvUtil.importFromStream(in);
 
-        // If file is for a single year, replace existing data for idempotence
-        if (entries.stream().map(BracketEntry::getYear).distinct().count() == 1) {
-            Integer year = entries.get(0).getYear();
-            System.out.printf("Preparing to replace tax rates for %d for idempotence.%n", year);
-            repo.deleteByYear(year);
-        }
+        // Intentionally do not replace existing data; imports are non-destructive
 
         Map<Integer, List<BracketEntry>> byYear = entries.stream()
                 .collect(Collectors.groupingBy(BracketEntry::getYear));
@@ -64,9 +59,6 @@ public class TaxDataImportService {
                 noTaxRepo.save(new NoIncomeTaxYear(year));
                 continue;
             }
-
-            // Ensure idempotence per year by clearing any existing rows first
-            repo.deleteByYear(year);
 
             for (BracketEntry entry : yearEntries) {
                 TaxRate tr = new TaxRate(
