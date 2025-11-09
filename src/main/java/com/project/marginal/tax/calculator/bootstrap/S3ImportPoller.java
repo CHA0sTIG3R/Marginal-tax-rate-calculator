@@ -36,7 +36,9 @@ public class S3ImportPoller {
     // Use cron expression if provided, else every 15 minutes by default
     @Scheduled(cron = "${tax.s3-import.cron:0 */15 * * * *}")
     public void poll() {
+        log.debug("S3ImportPoller tick; bucket={} key={} cron=active", s3Bucket, s3Key);
         if (s3Bucket == null || s3Bucket.isBlank() || s3Key == null || s3Key.isBlank()) {
+            log.debug("S3 import disabled or not configured (bucket/key missing)");
             return;
         }
         if (!running.compareAndSet(false, true)) {
@@ -49,6 +51,7 @@ public class S3ImportPoller {
                     .build()).eTag();
 
             if (eTag != null && eTag.equals(lastETag)) {
+                log.debug("ETag unchanged; skipping import");
                 return; // no change
             }
 
