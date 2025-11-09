@@ -5,12 +5,7 @@ on:
     workflows: ["CI"]
     types: [completed]
   workflow_dispatch:
-    inputs:
-      run_import:
-        description: "Run one-off data import before deploy"
-        type: boolean
-        required: false
-        default: false
+    {}
 
 jobs:
   deploy:
@@ -80,17 +75,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Decide whether to run data import
-        id: import
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.run_import }}" = "true" ]; then
-            echo "run_import=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run_import=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Determine if image-relevant files changed
         id: changes
         shell: bash
@@ -131,33 +115,9 @@ jobs:
         if: steps.changes.outputs.should_build != 'true'
         run: echo "No Docker/app changes detected. Skipping image build."
 
-      - name: Run one-off data import on EC2 (when requested)
-        if: steps.import.outputs.run_import == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          CMD_ID=$(aws ssm send-command \
-            --targets "Key=tag:${TARGET_TAG_KEY},Values=${TARGET_TAG_VALUE}" \
-            --document-name "AWS-RunShellScript" \
-            --comment "Run data-import once (idempotent)" \
-            --timeout-seconds 1200 \
-            --parameters '{"commands":["set -e","cd '"${APP_DIR}"'","pwd","ls -la","docker compose version","aws ecr get-login-password --region '"${AWS_REGION}"' | docker login --username AWS --password-stdin '"${ECR_REGISTRY}"'","timeout 900 docker compose run --rm -e SPRING_PROFILES_ACTIVE=data-import -e TAX_IMPORT_ON_STARTUP=true -e SPRING_MAIN_WEB_APPLICATION_TYPE=none tax_data"]}' \
-            --region "$AWS_REGION" \
-            --query 'Command.CommandId' --output text)
-          echo "Import CommandId: $CMD_ID"
-          # Poll until import completes on all targets
-          for i in $(seq 1 120); do
-            STATUS=$(aws ssm list-command-invocations --command-id "$CMD_ID" --details --query 'CommandInvocations[].Status' --output text)
-            echo "Import status: $STATUS"
-            if echo "$STATUS" | grep -qE 'Success'; then exit 0; fi
-            if echo "$STATUS" | grep -qE 'Failed|Cancelled|TimedOut'; then echo "Import failed with status: $STATUS" >&2; exit 1; fi
-            sleep 5
-          done
-          echo "Import timed out waiting for completion" >&2
-          exit 1
 
       - name: Deploy on EC2 via SSM
-        if: steps.changes.outputs.should_build == 'true' || steps.import.outputs.run_import == 'true'
+        if: steps.changes.outputs.should_build == 'true'
         shell: bash
         run: |
           set -euo pipefail
