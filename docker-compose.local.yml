@@ -8,20 +8,7 @@ services:
     logging:
       driver: local
     # Do not read base .env to avoid localhost URLs bleeding in
-    env_file: []
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/local_tax_db?sslmode=disable
-      SPRING_DATASOURCE_USERNAME: dev
-      SPRING_DATASOURCE_PASSWORD: devdb
-      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
-      # Rely on Flyway across environments (no Hibernate DDL)
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      # Align schema settings for local DB
-      APP_DB_SCHEMA: flyway_schema
-      SPRING_FLYWAY_SCHEMAS: flyway_schema
-      SPRING_FLYWAY_DEFAULT_SCHEMA: flyway_schema
-      # Keep data-import profile but skip actual import unless you set it true
-      TAX_IMPORT_ON_STARTUP: "false"
+    env_file: .env.local
     depends_on:
       db:
         condition: service_healthy

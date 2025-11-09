@@ -19,4 +19,8 @@ COPY --from=builder /workspace/target/*.war  /Marginal-tax-rate-calculator-0.0.1
 
 EXPOSE 8080
 
+# Simple liveness check using Actuator health endpoint
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=5 \
+  CMD wget -qO- http://127.0.0.1:8080/actuator/health | grep -q '"status":"UP"' || exit 1
+
 ENTRYPOINT ["java", "-jar", "/Marginal-tax-rate-calculator-0.0.1-SNAPSHOT.war"]
