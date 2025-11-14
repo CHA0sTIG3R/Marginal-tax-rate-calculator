@@ -1,6 +1,8 @@
-# Marginal Tax Rate Calculator
+# RateAtlas · TaxIQ (`rateatlas-api`)
 
-> **Spring Boot REST API** serving U.S. federal income tax bracket data (1862–present) and computation endpoints.
+> Spring Boot REST API serving U.S. federal tax bracket data (1862–present) and powering RateAtlas calculations.
+>
+> Part of the [RateAtlas](../README.md) stack.
 
 ## Overview
 
@@ -184,5 +186,4 @@ GitHub Actions:
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE)
-
 
